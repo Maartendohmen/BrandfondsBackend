@@ -1,7 +1,7 @@
 spring:
   datasource:
 #    url: jdbc:mysql://studmysql01.fhict.local/dbi363774
-    url: jdbc:mariadb://dohmennas@synology.me:3307/BrandFonds
+    url: jdbc:mariadb://77.175.243.68:3307/BrandFonds
 #    username: dbi363774
     username: Maarten
     password: Geheim123!

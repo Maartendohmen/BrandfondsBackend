@@ -22,8 +22,8 @@ public class CORSFilter extends GenericFilterBean implements Filter {
 
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.setHeader("Access-Control-Allow-Origin", "*");
-        httpResponse.setHeader("Access-Control-Allow-Methods", "POST");
-//        httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
+//        httpResponse.setHeader("Access-Control-Allow-Methods", "POST");
+        httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
 
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
 //        httpResponse.setHeader("Access-Control-Allow-Headers",

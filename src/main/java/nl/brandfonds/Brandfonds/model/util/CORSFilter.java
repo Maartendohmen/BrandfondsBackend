@@ -1,4 +1,4 @@
-package nl.brandfonds.Brandfonds;
+package nl.brandfonds.Brandfonds.model.util;
 
 import org.springframework.web.filter.GenericFilterBean;
 

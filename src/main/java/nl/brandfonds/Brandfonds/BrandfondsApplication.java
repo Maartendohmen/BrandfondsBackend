@@ -1,5 +1,6 @@
 package nl.brandfonds.Brandfonds;
 
+import nl.brandfonds.Brandfonds.model.util.CORSFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

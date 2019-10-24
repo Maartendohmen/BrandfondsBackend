@@ -37,16 +37,22 @@ public class UserController {
         }
     }
 
+    @RequestMapping(path = "/{id}/saldo",method = RequestMethod.GET)
+    public long GetUserSaldo(@PathVariable("id") Integer id)
+    {
+        return  userRepository.GetUserSaldo(id);
+    }
+
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public User Login(@RequestBody User user) {
-        return userRepository.Login(user.getUsername(), user.getPassword() + salt);
+        return userRepository.Login(user.getForname(), user.getPassword() + salt);
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public String Register(@RequestBody User user) {
         try {
 
-            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getUsername(), user.getPassword() + salt);
+            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword() + salt);
             registerRequestRepository.save(request);
             //email user request random string
             return request.getRandomString();
@@ -60,7 +66,7 @@ public class UserController {
         RegisterRequest corospondingrequest = registerRequestRepository.GetByrandomString(randomstring);
 
         if (corospondingrequest != null) {
-            userRepository.save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getUsername(), corospondingrequest.getPassword()));
+            userRepository.save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(), corospondingrequest.getSurname(), corospondingrequest.getPassword()));
             registerRequestRepository.delete(corospondingrequest);
             return true;
         }

@@ -14,15 +14,17 @@ public class RegisterRequest {
     private String randomString;
 
     private String emailadres;
-    private String username;
+    private String forname;
+    private String surname;
     private String password;
 
     public RegisterRequest() {
     }
-    public RegisterRequest(String emailadres, String username, String password) {
+    public RegisterRequest(String emailadres, String forname, String surname, String password) {
         this.randomString = RandomStringUtils.randomAlphanumeric(15);
         this.emailadres = emailadres;
-        this.username = username;
+        this.forname = forname;
+        this.surname = surname;
         this.password = password;
     }
 
@@ -32,18 +34,28 @@ public class RegisterRequest {
     public void setRandomString(String randomString) {
         this.randomString = randomString;
     }
+
     public String getEmailadres() {
         return emailadres;
     }
     public void setEmailadres(String emailadres) {
         this.emailadres = emailadres;
     }
-    public String getUsername() {
-        return username;
+
+    public String getForname() {
+        return forname;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setForname(String forname) {
+        this.forname = forname;
     }
+
+    public String getSurname() {
+        return surname;
+    }
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
     public String getPassword() {
         return password;
     }

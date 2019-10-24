@@ -22,6 +22,7 @@ public class User {
     private String forname;
     private String surname;
     private String password;
+    @Column(columnDefinition="double")
     private long saldo; //in cents
 
     public User() {

@@ -8,7 +8,7 @@ public class Day {
 
     @Id @GeneratedValue
     private Integer id;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     private User user;
     private Date date;
     private Integer stripes;

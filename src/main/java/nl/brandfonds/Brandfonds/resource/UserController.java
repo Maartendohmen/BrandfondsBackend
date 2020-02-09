@@ -48,6 +48,20 @@ public class UserController {
         return userRepository.GetUserSaldo(id);
     }
 
+    @RequestMapping(path = "/{id}/saldo", method = RequestMethod.PUT)
+    public boolean SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount)
+    {
+        try
+        {
+            userRepository.SetUserSaldo(Long.parseLong(amount),id);
+            return true;
+        }
+        catch (Exception x)
+        {
+            return false;
+        }
+    }
+
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public User Login(@RequestBody User user) {
         return userRepository.Login(user.getForname(), user.getPassword() + salt);

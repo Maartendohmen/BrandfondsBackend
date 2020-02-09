@@ -90,6 +90,7 @@ public class DayController {
         return 0;
     }
 
+
     /**
      * Get Total stripe number from user
      *

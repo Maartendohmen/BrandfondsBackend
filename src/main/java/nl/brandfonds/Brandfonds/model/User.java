@@ -4,13 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import nl.brandfonds.Brandfonds.model.util.SHA256;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import javax.persistence.*;
 
 @Entity
 public class User {
@@ -18,6 +12,9 @@ public class User {
     @Id
     @GeneratedValue
     private Integer id;
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+    @Column(unique = true)
     private String emailadres;
     private String forname;
     private String surname;
@@ -33,6 +30,7 @@ public class User {
         this.surname = surname;
         this.password = password;
         this.saldo = 0;
+        this.userRole = UserRole.NORMAL;
     }
 
     public Integer getId() {
@@ -77,5 +75,12 @@ public class User {
     }
     public void setSaldo(long saldo) {
         this.saldo = saldo;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 }

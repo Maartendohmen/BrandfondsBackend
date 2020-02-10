@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class SHA256 {
 
+    private static final String salt = "e24AzH";
+
     private SHA256() {
 
     }
@@ -23,7 +25,7 @@ public class SHA256 {
                 }
                 stringBuffer.append(hex);
             }
-            return stringBuffer.toString();
+            return stringBuffer.toString() + salt;
         }
         catch (NoSuchAlgorithmException |UnsupportedEncodingException e){
             throw new RuntimeException();

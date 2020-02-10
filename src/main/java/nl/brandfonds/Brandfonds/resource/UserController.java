@@ -17,8 +17,6 @@ import java.util.List;
 @RequestMapping(value = "/rest/user")
 public class UserController {
 
-    private String salt = "e24AzH";
-
     @Autowired
     UserRepository userRepository;
 
@@ -64,13 +62,13 @@ public class UserController {
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public User Login(@RequestBody User user) {
-        return userRepository.Login(user.getForname(), user.getPassword() + salt);
+        return userRepository.Login(user.getForname(), user.getPassword());
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public boolean Register(@RequestBody User user) {
         try {
-            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword() + salt);
+            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
             registerRequestRepository.save(request);
 
             Mail.SendRegisterMail(request.getEmailadres(), request.getRandomString());
@@ -151,7 +149,7 @@ public class UserController {
         try
         {
             PasswordChangeRequest request = passwordChangeRequestRepository.GetByrandomString(randomstring);
-            userRepository.UpdatePassword(SHA256.SHA256(password) + salt,request.getEmailadres());
+            userRepository.UpdatePassword(SHA256.SHA256(password),request.getEmailadres());
             passwordChangeRequestRepository.delete(request);
             return true;
         }

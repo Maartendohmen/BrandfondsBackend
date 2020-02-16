@@ -73,6 +73,20 @@ public class DayController {
         return dayRepository.AddStripe(date, userid);
     }
 
+    @RequestMapping(path = "/addstripes/{id}/{date}", method = RequestMethod.PUT)
+    public  int AddStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
+    {
+        User user = userRepository.GetByID(userid);
+
+        if (dayRepository.GetByUserIDAndDate(date, userid) == null) {
+            dayRepository.save(new Day(user, date, 0));
+        }
+        user.setSaldo(user.getSaldo() - (amount * 50));
+        return dayRepository.AddMultipleStripes(amount,date, userid);
+    }
+
+
+
     @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
     public int RemoveStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
         User user = userRepository.GetByID(userid);
@@ -84,6 +98,24 @@ public class DayController {
         } else if (specifiday != null) {
             user.setSaldo(user.getSaldo() + 50);
             dayRepository.RemoveStripe(date, userid);
+            dayRepository.delete(specifiday);
+            return 1;
+        }
+        return 0;
+    }
+
+    @RequestMapping(path = "/removestripes/{id}/{date}", method = RequestMethod.PUT)
+    public  int RemoveStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
+    {
+        User user = userRepository.GetByID(userid);
+        Day specifiday = dayRepository.GetByUserIDAndDate(date, userid);
+
+        if (specifiday != null && specifiday.getStripes() > amount) {
+            user.setSaldo(user.getSaldo() + (amount * 50));
+            return dayRepository.RemoveMultipleStripes(amount,date, userid);
+        } else if (specifiday != null) {
+            user.setSaldo(user.getSaldo() + (amount *50));
+            dayRepository.RemoveMultipleStripes(amount, date, userid);
             dayRepository.delete(specifiday);
             return 1;
         }

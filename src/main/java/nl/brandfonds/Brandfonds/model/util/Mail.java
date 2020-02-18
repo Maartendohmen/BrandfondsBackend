@@ -12,8 +12,8 @@ import java.util.Properties;
 
 public class Mail {
 
-        private static final String  mailadres = "maartendohmen@gmail.com";
-        private static final String password = "kgbworjbezjcbgee";
+        private static final String  mailadres = "blabla";
+        private static final String password = "blabla";
         private static Properties mailproperties;
         private static Session mailSession;
 

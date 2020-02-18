@@ -33,3 +33,6 @@ build/
 ### Passwords ###
 application.yml
 config.properties
+/src/main/java/nl/brandfonds/Brandfonds/model/util/Mail.java
+/src/main/resources/application.yml
+/src/main/resources/config.properties

@@ -31,6 +31,8 @@ build/
 .vscode/
 
 ### Passwords ###
-/src/main/java/nl/brandfonds/Brandfonds/model/util/Mail.java
-/src/main/resources/application.yml
-/src/main/resources/config.properties
+/src/main/resources/application-dev.properties
+/src/main/resources/application-prod.properties
+/src/main/resources/application.properties
+/src/main/resources/keystore.p12
+/src/main/resources/mail.properties

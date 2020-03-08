@@ -3,7 +3,7 @@ package nl.brandfonds.Brandfonds.resource;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.model.util.Mail;
+import nl.brandfonds.Brandfonds.model.util.MailService;
 import nl.brandfonds.Brandfonds.model.util.SHA256;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
@@ -26,6 +26,9 @@ public class UserController {
     @Autowired
     PasswordChangeRequestRepository passwordChangeRequestRepository;
 
+    @Autowired
+    MailService mailService;
+
     @RequestMapping(method = RequestMethod.GET)
     public List<User> getAll() {
         return userRepository.findAll();
@@ -47,15 +50,11 @@ public class UserController {
     }
 
     @RequestMapping(path = "/{id}/saldo", method = RequestMethod.PUT)
-    public boolean SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount)
-    {
-        try
-        {
-            userRepository.SetUserSaldo(Long.parseLong(amount),id);
+    public boolean SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) {
+        try {
+            userRepository.SetUserSaldo(Long.parseLong(amount), id);
             return true;
-        }
-        catch (Exception x)
-        {
+        } catch (Exception x) {
             return false;
         }
     }
@@ -71,7 +70,7 @@ public class UserController {
             RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
             registerRequestRepository.save(request);
 
-            Mail.SendRegisterMail(request.getEmailadres(), request.getRandomString());
+            mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
             return true;
         } catch (Exception x) {
             return false;
@@ -91,24 +90,23 @@ public class UserController {
     }
 
 
-
-
     //region Edit passwords methods
+
     /**
      * Request password change --> create passwordChangeRequest and and sends mail to user.
+     *
      * @param mailadres Mailadres for sending link to.
      * @return
      */
     @RequestMapping(path = "/forgotpassword/{mailadres}", method = RequestMethod.GET)
     public boolean ForgotPassword(@PathVariable("mailadres") String mailadres) {
 
-        if (userRepository.GetByMail(mailadres) != null)
-        {
+        if (userRepository.GetByMail(mailadres) != null) {
             try {
                 PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
                 passwordChangeRequestRepository.save(request);
 
-                Mail.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
+                mailService.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
                 return true;
 
             } catch (Exception x) {
@@ -117,44 +115,41 @@ public class UserController {
         }
 
         return false;
+
     }
 
     /**
      * Check if string provided by user is valid.
+     *
      * @param randomstring Random string to check
      * @return
      */
     @RequestMapping(path = "/resetpasswordcode/{randomstring}", method = RequestMethod.GET)
-    public boolean CheckPasswordString(@PathVariable("randomstring") String randomstring)
-    {
-            PasswordChangeRequest request = passwordChangeRequestRepository.GetByrandomString(randomstring);
+    public boolean CheckPasswordString(@PathVariable("randomstring") String randomstring) {
+        PasswordChangeRequest request = passwordChangeRequestRepository.GetByrandomString(randomstring);
 
-            if (request == null)
-            {
-                return false;
-            }
+        if (request == null) {
+            return false;
+        }
 
-            return true;
+        return true;
     }
 
     /**
      * Change password for user
+     *
      * @param randomstring String which is used to get attached email
-     * @param password New password provided for user
+     * @param password     New password provided for user
      * @return
      */
     @RequestMapping(path = "/resetpassword/{randomstring}", method = RequestMethod.POST)
-    public  boolean ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password)
-    {
-        try
-        {
+    public boolean ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) {
+        try {
             PasswordChangeRequest request = passwordChangeRequestRepository.GetByrandomString(randomstring);
-            userRepository.UpdatePassword(SHA256.SHA256(password),request.getEmailadres());
+            userRepository.UpdatePassword(SHA256.SHA256(password), request.getEmailadres());
             passwordChangeRequestRepository.delete(request);
             return true;
-        }
-        catch (Exception x)
-        {
+        } catch (Exception x) {
             return false;
         }
     }

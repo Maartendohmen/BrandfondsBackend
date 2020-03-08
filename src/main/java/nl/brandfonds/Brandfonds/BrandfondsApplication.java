@@ -11,8 +11,9 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-
+@EnableScheduling
 @SpringBootApplication
 public class BrandfondsApplication {
 
@@ -40,8 +41,6 @@ public class BrandfondsApplication {
 
 		return tomcat;
 	}
-
-
 
 
 	/*

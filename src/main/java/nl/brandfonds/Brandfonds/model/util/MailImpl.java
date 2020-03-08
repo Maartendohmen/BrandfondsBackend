@@ -1,17 +1,20 @@
 package nl.brandfonds.Brandfonds.model.util;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharSource;
+import com.google.common.io.Files;
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 @Service
@@ -20,6 +23,8 @@ public class MailImpl implements MailService {
 
     private String EMAILADRESS;
     private String PASSWORD;
+    private String FORGOTPASSWORDBASEURL;
+
     private Properties mailproperties;
     private Session mailSession;
 
@@ -31,6 +36,11 @@ public class MailImpl implements MailService {
     @Value("${automaticmail.password}")
     public void setPassword(String password) {
         PASSWORD = password;
+    }
+
+    @Value("${resetpassword.ownurl}")
+    public void setFORGOTPASSWORDBASEURL(String FORGOTPASSWORDBASEURL) {
+        this.FORGOTPASSWORDBASEURL = FORGOTPASSWORDBASEURL;
     }
 
     //todo clean up email text and make it nicer
@@ -79,14 +89,13 @@ public class MailImpl implements MailService {
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
                 message.setSubject("Wachtwoord reset brandfonds");
 
-                message.setText(
-                        "Ga naar de volgende pagina om uw wachtwoord te veranderen"
-                                +
-                                System.lineSeparator()
-                                +
-                                "http://localhost:4200/resetpassword/" + forgotPasswordCode
-                );
-                Transport.send(message);
+                //Readout html page
+                File file = ResourceUtils.getFile("classpath:html_pages/ForgotPassword.html");
+                CharSource content = Files.asCharSource(file, Charsets.UTF_8);
+                String htmlpage = content.read();
+                String newhtmlpage = htmlpage.replace("resetpasswordlink",FORGOTPASSWORDBASEURL + forgotPasswordCode);
+
+                message.setContent(newhtmlpage,"text/html");
 
                 Transport.send(message);
 
@@ -95,6 +104,8 @@ public class MailImpl implements MailService {
             } catch (MessagingException e) {
 
                 throw new RuntimeException(e);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
         t.start();

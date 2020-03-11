@@ -5,7 +5,9 @@ import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Service
@@ -90,10 +93,16 @@ public class MailImpl implements MailService {
                 message.setSubject("Wachtwoord reset brandfonds");
 
                 //Readout html page
-                File file = ResourceUtils.getFile("classpath:html_pages/ForgotPassword.html");
-                CharSource content = Files.asCharSource(file, Charsets.UTF_8);
-                String htmlpage = content.read();
-                String newhtmlpage = htmlpage.replace("resetpasswordlink",FORGOTPASSWORDBASEURL + forgotPasswordCode);
+                String data = "";
+                ClassPathResource resource = new ClassPathResource("/html_pages/ForgotPassword.html");
+                try {
+                    byte[] dataArr = FileCopyUtils.copyToByteArray(resource.getInputStream());
+                    data = new String(dataArr, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // do whatever
+                }
+
+                String newhtmlpage = data.replace("resetpasswordlink",FORGOTPASSWORDBASEURL + forgotPasswordCode);
 
                 message.setContent(newhtmlpage,"text/html");
 
@@ -104,8 +113,6 @@ public class MailImpl implements MailService {
             } catch (MessagingException e) {
 
                 throw new RuntimeException(e);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         });
         t.start();

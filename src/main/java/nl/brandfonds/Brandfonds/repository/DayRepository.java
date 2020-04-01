@@ -49,9 +49,4 @@ public interface DayRepository extends JpaRepository<Day,Integer> {
     @Query("SELECT SUM(stripes) FROM Day WHERE user_id = ?1")
     int GetTotalStripesFromUser(Integer id);
 
-
-
-
-
-
 }

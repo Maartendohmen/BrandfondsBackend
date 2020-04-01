@@ -1,27 +1,22 @@
-package nl.brandfonds.Brandfonds.model.util;
+package nl.brandfonds.Brandfonds.implementation;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.CharSource;
-import com.google.common.io.Files;
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
+import nl.brandfonds.Brandfonds.abstraction.IMailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Service
-public class MailImpl implements MailService {
+public class MailImpl implements IMailService {
 
 
     private String EMAILADRESS;

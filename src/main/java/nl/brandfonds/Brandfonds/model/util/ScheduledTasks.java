@@ -34,8 +34,6 @@ public class ScheduledTasks {
 
     @Scheduled(fixedDelay = 30000)
     public void DeleteRegisterRequests() {
-
-        System.out.println("worked");
         registerRequestRepository.findAll().forEach(registerRequest -> {
             if (new Date().getTime() - registerRequest.getInitialdate().getTime() >= 20 * 60 * 1000
                     ) {

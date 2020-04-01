@@ -1,6 +1,6 @@
-package nl.brandfonds.Brandfonds.model.util;
+package nl.brandfonds.Brandfonds.abstraction;
 
-public interface MailService {
+public interface IMailService {
 
     public abstract void SendRegisterMail(String receipent, String registrationCode);
 

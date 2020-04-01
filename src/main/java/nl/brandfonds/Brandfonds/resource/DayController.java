@@ -1,5 +1,7 @@
 package nl.brandfonds.Brandfonds.resource;
 
+import nl.brandfonds.Brandfonds.abstraction.IDayService;
+import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.repository.DayRepository;
@@ -17,10 +19,10 @@ import java.util.*;
 public class DayController {
 
     @Autowired
-    DayRepository dayRepository;
+    IDayService dayService;
 
     @Autowired
-    UserRepository userRepository;
+    IUserService userService;
 
     /**
      * Get all Days from all users
@@ -29,7 +31,7 @@ public class DayController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Day> getAll() {
-        return dayRepository.findAll();
+        return dayService.GetAll();
     }
 
     /**
@@ -40,7 +42,7 @@ public class DayController {
      */
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public List<Day> GetAllFromUser(@PathVariable("id") Integer userid) {
-        return dayRepository.GetByUserID(userid);
+        return dayService.GetByUserID(userid);
     }
 
     /**
@@ -52,7 +54,7 @@ public class DayController {
      */
     @RequestMapping(path = "/{id}/{date}", method = RequestMethod.GET)
     public Day GetFromSingleUserByDate(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
-        return dayRepository.GetByUserIDAndDate(date, userid);
+        return dayService.GetByUserIDAndDate(date, userid);
     }
 
     /**
@@ -64,41 +66,39 @@ public class DayController {
      */
     @RequestMapping(path = "/addstripe/{id}/{date}", method = RequestMethod.GET)
     public int AddStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
-        User user = userRepository.GetByID(userid);
+        User user = userService.GetOne(userid);
 
-        if (dayRepository.GetByUserIDAndDate(date, userid) == null) {
-            dayRepository.save(new Day(user, date, 0));
+        if (dayService.GetByUserIDAndDate(date, userid) == null) {
+            dayService.Save(new Day(user, date, 0));
         }
         user.setSaldo(user.getSaldo() - 50);
-        return dayRepository.AddStripe(date, userid);
+        return dayService.AddStripe(date, userid);
     }
 
     @RequestMapping(path = "/addstripes/{id}/{date}", method = RequestMethod.PUT)
     public  int AddStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
     {
-        User user = userRepository.GetByID(userid);
+        User user = userService.GetOne(userid);
 
-        if (dayRepository.GetByUserIDAndDate(date, userid) == null) {
-            dayRepository.save(new Day(user, date, 0));
+        if (dayService.GetByUserIDAndDate(date, userid) == null) {
+            dayService.Save(new Day(user, date, 0));
         }
         user.setSaldo(user.getSaldo() - (amount * 50));
-        return dayRepository.AddMultipleStripes(amount,date, userid);
+        return dayService.AddMultipleStripes(amount,date, userid);
     }
-
-
 
     @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
     public int RemoveStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
-        User user = userRepository.GetByID(userid);
-        Day specifiday = dayRepository.GetByUserIDAndDate(date, userid);
+        User user = userService.GetOne(userid);
+        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
 
         if (specifiday != null && specifiday.getStripes() >= 2) {
             user.setSaldo(user.getSaldo() + 50);
-            return dayRepository.RemoveStripe(date, userid);
+            return dayService.RemoveStripe(date, userid);
         } else if (specifiday != null) {
             user.setSaldo(user.getSaldo() + 50);
-            dayRepository.RemoveStripe(date, userid);
-            dayRepository.delete(specifiday);
+            dayService.RemoveStripe(date, userid);
+            dayService.Delete(specifiday);
             return 1;
         }
         return 0;
@@ -107,16 +107,16 @@ public class DayController {
     @RequestMapping(path = "/removestripes/{id}/{date}", method = RequestMethod.PUT)
     public  int RemoveStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
     {
-        User user = userRepository.GetByID(userid);
-        Day specifiday = dayRepository.GetByUserIDAndDate(date, userid);
+        User user = userService.GetOne(userid);
+        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
 
         if (specifiday != null && specifiday.getStripes() > amount) {
             user.setSaldo(user.getSaldo() + (amount * 50));
-            return dayRepository.RemoveMultipleStripes(amount,date, userid);
+            return dayService.RemoveMultipleStripes(amount,date, userid);
         } else if (specifiday != null) {
             user.setSaldo(user.getSaldo() + (amount *50));
-            dayRepository.RemoveMultipleStripes(amount, date, userid);
-            dayRepository.delete(specifiday);
+            dayService.RemoveMultipleStripes(amount, date, userid);
+            dayService.Delete(specifiday);
             return 1;
         }
         return 0;
@@ -132,7 +132,7 @@ public class DayController {
     @RequestMapping(path = "/{id}/totalstripes", method = RequestMethod.GET)
     public int GetTotalStripes(@PathVariable("id") Integer userid) {
         try {
-            return dayRepository.GetTotalStripesFromUser(userid);
+            return dayService.GetTotalStripesFromUser(userid);
         }
         //No totalstripes because there are no stripes
         catch (AopInvocationException exception) {
@@ -144,7 +144,7 @@ public class DayController {
     @RequestMapping(path = "/{id}/sortedbymonth", method = RequestMethod.GET)
     public Map<String, Integer> GetTotalStripesPerMonth(@PathVariable("id") Integer userid) {
         Map<String, Integer> sortedstripes = new HashMap<>();
-        List<Day> alldays = dayRepository.GetByUserID(userid);
+        List<Day> alldays = dayService.GetByUserID(userid);
 
         for (Day d : alldays) {
 

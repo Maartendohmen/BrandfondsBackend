@@ -1,12 +1,10 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
-import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
-import nl.brandfonds.Brandfonds.abstraction.IUserService;
+import nl.brandfonds.Brandfonds.abstraction.*;
+import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.abstraction.IMailService;
 import nl.brandfonds.Brandfonds.model.util.SHA256;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
@@ -14,6 +12,7 @@ import nl.brandfonds.Brandfonds.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,6 +27,9 @@ public class UserController {
 
     @Autowired
     IPasswordChangeRequestService passwordChangeRequestService;
+
+    @Autowired
+    IDepositRequestService depositRequestService;
 
     @Autowired
     IMailService mailService;
@@ -67,6 +69,7 @@ public class UserController {
         return userService.Login(user.getForname(), user.getPassword());
     }
 
+    //region Register methods
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public boolean Register(@RequestBody User user) {
         try {
@@ -91,10 +94,9 @@ public class UserController {
         }
         return false;
     }
-
+    //endregion
 
     //region Edit passwords methods
-
     /**
      * Request password change --> create passwordChangeRequest and and sends mail to user.
      *
@@ -157,6 +159,52 @@ public class UserController {
         }
     }
     //endregion
+
+    @RequestMapping(path = "/{id}/deposit", method = RequestMethod.POST)
+    public boolean SetDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount){
+        try{
+            depositRequestService.Save(new DepositRequest(userService.GetOne(id), Long.parseLong(amount)));
+            return true;
+        }
+        catch (Exception x){
+            return false;
+        }
+    }
+
+    @RequestMapping(path = "/deposit", method = RequestMethod.GET)
+    public List<DepositRequest> GetDepositRequest()
+    {
+        return depositRequestService.GetAll();
+    }
+
+    @RequestMapping(path = "/depositapprove/{id}", method = RequestMethod.GET)
+    public boolean ApproveDepositRequest(@PathVariable("id") Integer id){
+        try{
+            DepositRequest request = depositRequestService.GetOne(id);
+
+            User user = userService.GetOne(request.getUser().getId());
+            user.setSaldo(user.getSaldo() + request.getAmount());
+            userService.Save(user);
+
+            request.ValidateRequest();
+            depositRequestService.Save(request);
+            return true;
+        }catch (Exception x)
+        {
+            return false;
+        }
+    }
+
+    @RequestMapping(path = "/depositreject/{id}", method = RequestMethod.GET)
+    public boolean RejectDepositRequest(@PathVariable("id") Integer id){
+        try{
+            DepositRequest request = depositRequestService.GetOne(id);
+            request.setHandledDate(new Date());
+            return true;
+        }catch (Exception x){
+            return false;
+        }
+    }
 
 
 }

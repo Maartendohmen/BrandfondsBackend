@@ -10,7 +10,7 @@ public class DepositRequest {
     private Integer id;
     @OneToOne
     private User user;
-    private int amount; //in cents;
+    private long amount; //in cents;
     private Date requestDate;
     private Date handledDate;
     private boolean accepted;
@@ -18,7 +18,7 @@ public class DepositRequest {
     public DepositRequest() {
     }
 
-    public DepositRequest(User user, int amount) {
+    public DepositRequest(User user, long amount) {
         this.user = user;
         this.amount = amount;
         this.requestDate = new Date();
@@ -32,7 +32,7 @@ public class DepositRequest {
     public User getUser() {
         return user;
     }
-    public int getAmount() {
+    public long getAmount() {
         return amount;
     }
     public Date getRequestDate() {
@@ -52,7 +52,7 @@ public class DepositRequest {
     public void setUser(User user) {
         this.user = user;
     }
-    public void setAmount(int amount) {
+    public void setAmount(long amount) {
         this.amount = amount;
     }
     public void setRequestDate(Date requestDate) {

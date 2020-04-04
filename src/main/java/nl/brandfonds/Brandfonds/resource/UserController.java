@@ -73,6 +73,7 @@ public class UserController {
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public boolean Register(@RequestBody User user) {
         try {
+
             RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
             registerRequestService.Save(request);
 

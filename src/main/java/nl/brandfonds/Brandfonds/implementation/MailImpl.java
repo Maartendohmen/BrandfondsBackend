@@ -22,6 +22,7 @@ public class MailImpl implements IMailService {
     private String EMAILADRESS;
     private String PASSWORD;
     private String FORGOTPASSWORDBASEURL;
+    private String REGISTRATIONURL;
 
     private Properties mailproperties;
     private Session mailSession;
@@ -41,6 +42,13 @@ public class MailImpl implements IMailService {
         this.FORGOTPASSWORDBASEURL = FORGOTPASSWORDBASEURL;
     }
 
+    @Value("${registration.ownurl}")
+    public void setREGISTRATIONURL(String REGISTRATIONURL) {
+        this.REGISTRATIONURL = REGISTRATIONURL;
+    }
+
+
+
     //todo clean up email text and make it nicer
     //BE AWARE AVG MUST BE OFF BEFORE TESTING
 
@@ -52,17 +60,22 @@ public class MailImpl implements IMailService {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(EMAILADRESS));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
-                message.setSubject("Registratie brandfonds");
+                message.setSubject("Wachtwoord reset brandfonds");
 
-                message.setText(
-                        "Bedankt voor je registratie bij het brandfonds. Kopieer de onderstaande code om je registratie te bevestigen"
-                                +
-                                System.lineSeparator()
-                                +
-                                System.lineSeparator()
-                                +
-                                "De code voor de registratie is : " + registrationCode
-                );
+                //Readout html page
+                String data = "";
+                ClassPathResource resource = new ClassPathResource("/html_pages/Register.html");
+                try {
+                    byte[] dataArr = FileCopyUtils.copyToByteArray(resource.getInputStream());
+                    data = new String(dataArr, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // do whatever
+                }
+
+                String newhtmlpage = data.replace("registratielink",REGISTRATIONURL + registrationCode);
+
+                message.setContent(newhtmlpage,"text/html");
+
                 Transport.send(message);
 
                 System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);

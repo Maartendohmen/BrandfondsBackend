@@ -1,6 +1,8 @@
 package nl.brandfonds.Brandfonds.resource;
 
 import nl.brandfonds.Brandfonds.abstraction.*;
+import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
+import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
@@ -9,9 +11,13 @@ import nl.brandfonds.Brandfonds.model.util.SHA256;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.List;
 
@@ -40,27 +46,29 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public boolean Save(@RequestBody User user) {
-        try {
+    public void Save(@RequestBody User user) {
             userService.Save(user);
-            return true;
-        } catch (Exception x) {
-            return false;
-        }
     }
 
+
+    //#exception handling implemented
     @RequestMapping(path = "/{id}/saldo", method = RequestMethod.GET)
-    public long GetUserSaldo(@PathVariable("id") Integer id) {
-        return userService.GetUserSaldo(id);
+    public long GetUserSaldo(@PathVariable("id") Integer id) throws UserNotFoundException {
+        try {
+            return userService.GetUserSaldo(id);
+        }catch (AopInvocationException ex)
+        {
+            throw new UserNotFoundException("De gebruiker kan niet worden opgehaald");
+        }
+
     }
 
     @RequestMapping(path = "/{id}/saldo", method = RequestMethod.PUT)
-    public boolean SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) {
+    public void SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) {
         try {
             userService.SetUserSaldo(Long.parseLong(amount), id);
-            return true;
         } catch (Exception x) {
-            return false;
+
         }
     }
 
@@ -71,29 +79,30 @@ public class UserController {
 
     //region Register methods
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public boolean Register(@RequestBody User user) {
-        try {
+    public void Register(@RequestBody User user){
 
             RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
             registerRequestService.Save(request);
 
             mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
-            return true;
-        } catch (Exception x) {
-            return false;
         }
-    }
 
     @RequestMapping(path = "/registerconformation/{randomstring}", method = RequestMethod.GET)
-    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) {
+    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException {
         RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
 
-        if (corospondingrequest != null) {
-            userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(), corospondingrequest.getSurname(), corospondingrequest.getPassword()));
-            registerRequestService.Delete(corospondingrequest);
+        try{
+            if (corospondingrequest != null) {
+                userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(), corospondingrequest.getSurname(), corospondingrequest.getPassword()));
+                registerRequestService.Delete(corospondingrequest);
+            }
             return true;
         }
-        return false;
+        catch (Exception ex)
+        {
+            throw new AlreadyExistException("Er bestaat al een gebruiker met dit emailadres");
+        }
+
     }
     //endregion
 
@@ -105,24 +114,22 @@ public class UserController {
      * @return
      */
     @RequestMapping(path = "/forgotpassword/{mailadres}", method = RequestMethod.GET)
-    public boolean ForgotPassword(@PathVariable("mailadres") String mailadres) {
+    public boolean ForgotPassword(@PathVariable("mailadres") String mailadres) throws UserNotFoundException {
 
         if (userService.GetByMail(mailadres) != null) {
-            try {
+
                 PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
                 passwordChangeRequestService.Save(request);
 
                 mailService.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
                 return true;
-
-            } catch (Exception x) {
-                return false;
             }
+
+            throw new UserNotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
         }
 
-        return false;
 
-    }
+
 
     /**
      * Check if string provided by user is valid.

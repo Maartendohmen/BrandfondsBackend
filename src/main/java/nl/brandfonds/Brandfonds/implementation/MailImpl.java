@@ -89,7 +89,6 @@ public class MailImpl implements IMailService {
 
     }
 
-    //fix correct mailing
     public void SendChangePasswordMail(String receipent, String forgotPasswordCode) {
         ReadInputProperties();
 

@@ -27,7 +27,7 @@ public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestServic
 
     @Override
     public void Save(PasswordChangeRequest passwordChangeRequest) {
-         passwordChangeRequestRepository.save(passwordChangeRequest);
+        passwordChangeRequestRepository.save(passwordChangeRequest);
     }
 
     @Override

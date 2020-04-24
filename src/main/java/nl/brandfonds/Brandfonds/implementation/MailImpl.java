@@ -60,7 +60,7 @@ public class MailImpl implements IMailService {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(EMAILADRESS));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
-                message.setSubject("Wachtwoord reset brandfonds");
+                message.setSubject("Registratie brandfonds");
 
                 //Readout html page
                 String data = "";

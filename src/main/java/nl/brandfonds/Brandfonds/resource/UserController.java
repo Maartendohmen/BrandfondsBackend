@@ -64,11 +64,11 @@ public class UserController {
     }
 
     @RequestMapping(path = "/{id}/saldo", method = RequestMethod.PUT)
-    public void SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) {
+    public void SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) throws UserNotFoundException {
         try {
             userService.SetUserSaldo(Long.parseLong(amount), id);
         } catch (Exception x) {
-
+            throw new UserNotFoundException("Het veranderen van het saldo is mislukt, de gebruiker kan niet gevonden worden");
         }
     }
 
@@ -79,13 +79,19 @@ public class UserController {
 
     //region Register methods
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public void Register(@RequestBody User user){
+    public boolean Register(@RequestBody User user) {
 
+        try {
             RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
             registerRequestService.Save(request);
 
             mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
+            return true;
+        } catch (Exception x) {
+            System.out.println(x);
         }
+        return false;
+    }
 
     @RequestMapping(path = "/registerconformation/{randomstring}", method = RequestMethod.GET)
     public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException {
@@ -208,6 +214,7 @@ public class UserController {
         try{
             DepositRequest request = depositRequestService.GetOne(id);
             request.setHandledDate(new Date());
+            depositRequestService.Save(request);
             return true;
         }catch (Exception x){
             return false;

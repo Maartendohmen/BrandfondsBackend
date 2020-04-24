@@ -15,13 +15,6 @@ public interface IDayService {
 
     public abstract void Delete(Day day);
 
-
-
-
-
-
-
-
     public  abstract List<Day> GetByUserID(Integer id);
 
     public  abstract List<Day> GetByDate(Date date);

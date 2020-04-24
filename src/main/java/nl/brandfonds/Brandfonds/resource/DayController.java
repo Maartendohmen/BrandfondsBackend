@@ -24,6 +24,8 @@ public class DayController {
     @Autowired
     IUserService userService;
 
+    //region Get Stripes methods
+
     /**
      * Get all Days from all users
      *
@@ -58,76 +60,10 @@ public class DayController {
     }
 
     /**
-     * Adds a stripe for user on specific date
-     *
-     * @param userid id of user
-     * @param date   date of stripe
-     * @return
-     */
-    @RequestMapping(path = "/addstripe/{id}/{date}", method = RequestMethod.GET)
-    public int AddStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
-        User user = userService.GetOne(userid);
-
-        if (dayService.GetByUserIDAndDate(date, userid) == null) {
-            dayService.Save(new Day(user, date, 0));
-        }
-        user.setSaldo(user.getSaldo() - 50);
-        return dayService.AddStripe(date, userid);
-    }
-
-    @RequestMapping(path = "/addstripes/{id}/{date}", method = RequestMethod.PUT)
-    public  int AddStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
-    {
-        User user = userService.GetOne(userid);
-
-        if (dayService.GetByUserIDAndDate(date, userid) == null) {
-            dayService.Save(new Day(user, date, 0));
-        }
-        user.setSaldo(user.getSaldo() - (amount * 50));
-        return dayService.AddMultipleStripes(amount,date, userid);
-    }
-
-    @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
-    public int RemoveStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
-        User user = userService.GetOne(userid);
-        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
-
-        if (specifiday != null && specifiday.getStripes() >= 2) {
-            user.setSaldo(user.getSaldo() + 50);
-            return dayService.RemoveStripe(date, userid);
-        } else if (specifiday != null) {
-            user.setSaldo(user.getSaldo() + 50);
-            dayService.RemoveStripe(date, userid);
-            dayService.Delete(specifiday);
-            return 1;
-        }
-        return 0;
-    }
-
-    @RequestMapping(path = "/removestripes/{id}/{date}", method = RequestMethod.PUT)
-    public  int RemoveStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount)
-    {
-        User user = userService.GetOne(userid);
-        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
-
-        if (specifiday != null && specifiday.getStripes() > amount) {
-            user.setSaldo(user.getSaldo() + (amount * 50));
-            return dayService.RemoveMultipleStripes(amount,date, userid);
-        } else if (specifiday != null) {
-            user.setSaldo(user.getSaldo() + (amount *50));
-            dayService.RemoveMultipleStripes(amount, date, userid);
-            dayService.Delete(specifiday);
-            return 1;
-        }
-        return 0;
-    }
-
-
-    /**
      * Get Total stripe number from user
      *
      * @param userid id of user
-     * @return
+     * @return number of total stripes
      */
     @RequestMapping(path = "/{id}/totalstripes", method = RequestMethod.GET)
     public int GetTotalStripes(@PathVariable("id") Integer userid) {
@@ -140,7 +76,12 @@ public class DayController {
         }
     }
 
-
+    /**
+     * Get all stripes from user coupled per month
+     *
+     * @param userid The id of the user to get the stripes from
+     * @return Map with <date, amount of stripes>
+     */
     @RequestMapping(path = "/{id}/sortedbymonth", method = RequestMethod.GET)
     public Map<String, Integer> GetTotalStripesPerMonth(@PathVariable("id") Integer userid) {
         Map<String, Integer> sortedstripes = new HashMap<>();
@@ -161,4 +102,97 @@ public class DayController {
         }
         return sortedstripes;
     }
+
+    //endregion
+
+    //region Edit Stripes methods
+
+    /**
+     * Adds a stripe for user on specific date
+     *
+     * @param userid id of user
+     * @param date   date of stripe
+     * @return
+     */
+    @RequestMapping(path = "/addstripe/{id}/{date}", method = RequestMethod.GET)
+    public int AddStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
+        User user = userService.GetOne(userid);
+
+        if (dayService.GetByUserIDAndDate(date, userid) == null) {
+            dayService.Save(new Day(user, date, 0));
+        }
+        user.setSaldo(user.getSaldo() - 50);
+        return dayService.AddStripe(date, userid);
+    }
+
+    /**
+     * Add multiple stripes for user on specfic date
+     *
+     * @param userid The id of the user which should be given stripes
+     * @param date   The date of the day the stripes should be added to
+     * @param amount The amount of stripes that should be added
+     * @return The number of database rows that have been affected by this change
+     */
+    @RequestMapping(path = "/addstripes/{id}/{date}", method = RequestMethod.PUT)
+    public int AddStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount) {
+        User user = userService.GetOne(userid);
+
+        if (dayService.GetByUserIDAndDate(date, userid) == null) {
+            dayService.Save(new Day(user, date, 0));
+        }
+        user.setSaldo(user.getSaldo() - (amount * 50));
+        return dayService.AddMultipleStripes(amount, date, userid);
+    }
+
+    /**
+     * Remove a stripe for user on specfic date
+     *
+     * @param userid The id of the user which should be removing stripe
+     * @param date   The date of the day the stripe should be removed from
+     * @return The number of database rows that have been affected by this change
+     */
+    @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
+    public int RemoveStripeForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date) {
+        User user = userService.GetOne(userid);
+        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
+
+        if (specifiday != null && specifiday.getStripes() >= 2) {
+            user.setSaldo(user.getSaldo() + 50);
+            return dayService.RemoveStripe(date, userid);
+        } else if (specifiday != null) {
+            user.setSaldo(user.getSaldo() + 50);
+            dayService.RemoveStripe(date, userid);
+            dayService.Delete(specifiday);
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * Remove multiple stripes for user on specfic date
+     *
+     * @param userid The id of the user which should be removing stripes
+     * @param date   The date of the day the stripes should be removed from
+     * @param amount The amount of stripes that should be removed
+     * @return The number of database rows that have been affected by this change
+     */
+    @RequestMapping(path = "/removestripes/{id}/{date}", method = RequestMethod.PUT)
+    public int RemoveStripesForUser(@PathVariable("id") Integer userid, @PathVariable("date") Date date, @RequestBody Integer amount) {
+        User user = userService.GetOne(userid);
+        Day specifiday = dayService.GetByUserIDAndDate(date, userid);
+
+        if (specifiday != null && specifiday.getStripes() > amount) {
+            user.setSaldo(user.getSaldo() + (amount * 50));
+            return dayService.RemoveMultipleStripes(amount, date, userid);
+        } else if (specifiday != null) {
+            user.setSaldo(user.getSaldo() + (amount * 50));
+            dayService.RemoveMultipleStripes(amount, date, userid);
+            dayService.Delete(specifiday);
+            return 1;
+        }
+        return 0;
+    }
+
+    //endregion
+
 }

@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     @Query("SELECT u FROM User u WHERE emailadres = ?1")
     User GetByMail(String mail);
 
+    @Query("SELECT u FROM User u WHERE forname = ?1")
+    User GetByName(String name);
+
     @Query("SELECT saldo FROM User WHERE id = ?1")
     long GetUserSaldo(Integer id);
 

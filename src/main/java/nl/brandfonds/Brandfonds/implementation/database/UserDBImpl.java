@@ -51,6 +51,11 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
+    public User GetByName(String name) {
+        return userRepository.GetByName(name);
+    }
+
+    @Override
     public long GetUserSaldo(Integer id) {
         return userRepository.GetUserSaldo(id);
     }

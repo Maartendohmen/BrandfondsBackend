@@ -21,6 +21,8 @@ public interface IUserService{
 
     public  abstract User GetByMail(String mail);
 
+    public abstract User GetByName(String name);
+
     public  abstract long GetUserSaldo(Integer id);
 
     public  abstract void SetUserSaldo(Long amount,Integer id);

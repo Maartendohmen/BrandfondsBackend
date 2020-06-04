@@ -4,6 +4,7 @@ import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
+import nl.brandfonds.Brandfonds.model.responses.StripesMonth;
 import nl.brandfonds.Brandfonds.repository.DayRepository;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
 import org.springframework.aop.AopInvocationException;
@@ -83,9 +84,11 @@ public class DayController {
      * @return Map with <date, amount of stripes>
      */
     @RequestMapping(path = "/{id}/sortedbymonth", method = RequestMethod.GET)
-    public Map<String, Integer> GetTotalStripesPerMonth(@PathVariable("id") Integer userid) {
+    public List<StripesMonth> GetTotalStripesPerMonth(@PathVariable("id") Integer userid) {
         Map<String, Integer> sortedstripes = new HashMap<>();
         List<Day> alldays = dayService.GetByUserID(userid);
+
+        //todo clean up and get rid of map, use list in method instead
 
         for (Day d : alldays) {
 
@@ -100,7 +103,13 @@ public class DayController {
                 sortedstripes.put(key, d.getStripes());
             }
         }
-        return sortedstripes;
+
+        List<StripesMonth> stripesMonths = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : sortedstripes.entrySet()) {
+            stripesMonths.add(new StripesMonth(entry.getKey(),entry.getValue()));
+        }
+
+        return stripesMonths;
     }
 
     //endregion

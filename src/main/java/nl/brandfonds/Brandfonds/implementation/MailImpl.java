@@ -2,6 +2,7 @@ package nl.brandfonds.Brandfonds.implementation;
 
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
+import nl.brandfonds.Brandfonds.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class MailImpl implements IMailService {
     private String PASSWORD;
     private String FORGOTPASSWORDBASEURL;
     private String REGISTRATIONURL;
+    private String ACTIVATEUSERURL;
 
     private Properties mailproperties;
     private Session mailSession;
@@ -47,9 +49,11 @@ public class MailImpl implements IMailService {
         this.REGISTRATIONURL = REGISTRATIONURL;
     }
 
+    @Value("${activateuser.ownurl}")
+    public void setACTIVATEUSERURL(String ACTIVATEUSERURL){
+        this.ACTIVATEUSERURL = ACTIVATEUSERURL;
+    }
 
-
-    //todo clean up email text and make it nicer
     //BE AWARE AVG MUST BE OFF BEFORE TESTING
 
     public void SendRegisterMail(String receipent, String registrationCode) {
@@ -110,6 +114,81 @@ public class MailImpl implements IMailService {
                 }
 
                 String newhtmlpage = data.replace("resetpasswordlink",FORGOTPASSWORDBASEURL + forgotPasswordCode);
+
+                message.setContent(newhtmlpage,"text/html");
+
+                Transport.send(message);
+
+                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+
+            } catch (MessagingException e) {
+
+                throw new RuntimeException(e);
+            }
+        });
+        t.start();
+    }
+
+    public void SendUserActivationMail(String receipent,String email, String username, Integer id){
+        ReadInputProperties();
+
+        Thread t = new Thread(() -> {
+            try {
+                MimeMessage message = new MimeMessage(mailSession);
+                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.setSubject("Gebruiker activeren brandfonds");
+
+                //Readout html page
+                String data = "";
+                ClassPathResource resource = new ClassPathResource("/html_pages/ActivateUser.html");
+                try {
+                    byte[] dataArr = FileCopyUtils.copyToByteArray(resource.getInputStream());
+                    data = new String(dataArr, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // do whatever
+                }
+
+                String newhtmlpage = data.replace("ACTIVATEUSERURL",ACTIVATEUSERURL + id);
+                newhtmlpage = newhtmlpage.replace("USERNAME",username);
+                newhtmlpage = newhtmlpage.replace("MAILADRES",email);
+
+                message.setContent(newhtmlpage,"text/html");
+
+                Transport.send(message);
+
+                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+
+            } catch (MessagingException e) {
+
+                throw new RuntimeException(e);
+            }
+        });
+        t.start();
+    }
+
+    public void SendUserActivatedMail(String receipent,String email, String username){
+        ReadInputProperties();
+
+        Thread t = new Thread(() -> {
+            try {
+                MimeMessage message = new MimeMessage(mailSession);
+                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.setSubject("Gebruiker geactiveerd brandfonds");
+
+                //Readout html page
+                String data = "";
+                ClassPathResource resource = new ClassPathResource("/html_pages/ActivatedUser.html");
+                try {
+                    byte[] dataArr = FileCopyUtils.copyToByteArray(resource.getInputStream());
+                    data = new String(dataArr, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // do whatever
+                }
+
+                String newhtmlpage = data.replace("USERNAME",username);
+                newhtmlpage = newhtmlpage.replace("MAILADRES",email);
 
                 message.setContent(newhtmlpage,"text/html");
 

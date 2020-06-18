@@ -6,9 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface UserRepository extends JpaRepository<User,Integer> {
+    public interface UserRepository extends JpaRepository<User,Integer> {
 
-    //Login user with credentials
     @Query("SELECT u FROM User u WHERE forname = ?1 AND password = ?2")
     User Login(String username,String password);
 

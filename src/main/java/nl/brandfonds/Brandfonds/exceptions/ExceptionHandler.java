@@ -14,12 +14,10 @@ import java.util.Date;
 @ControllerAdvice
 public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
-
-
     @org.springframework.web.bind.annotation.ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAnyException(Exception ex, WebRequest request){
 
-        ErrorMessage errorMessage = new ErrorMessage(new Date(), ex.getMessage());
+        ErrorMessage errorMessage = new ErrorMessage(new Date(), ex.getMessage(), ex.getClass().getSimpleName());
 
         return new ResponseEntity<>(errorMessage,new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }

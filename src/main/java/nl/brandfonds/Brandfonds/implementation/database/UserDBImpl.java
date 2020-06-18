@@ -26,6 +26,11 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
+    public User GetByID(Integer id) {
+        return userRepository.GetByID(id);
+    }
+
+    @Override
     public User GetOne(Integer id) {
         return userRepository.getOne(id);
     }

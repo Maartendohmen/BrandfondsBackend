@@ -21,6 +21,7 @@ public class User {
     private String password;
     @Column(columnDefinition="double")
     private long saldo; //in cents
+    private boolean activated;
 
     public User() {
     }
@@ -31,6 +32,7 @@ public class User {
         this.password = password;
         this.saldo = 0;
         this.userRole = UserRole.NORMAL;
+        this.activated = false;
     }
 
     public Integer getId() {
@@ -82,5 +84,12 @@ public class User {
     }
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 }

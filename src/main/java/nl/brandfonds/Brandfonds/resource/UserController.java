@@ -2,6 +2,8 @@ package nl.brandfonds.Brandfonds.resource;
 
 import nl.brandfonds.Brandfonds.abstraction.*;
 import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
+import nl.brandfonds.Brandfonds.exceptions.LinkExpiredException;
+import nl.brandfonds.Brandfonds.exceptions.UserDisabledException;
 import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
@@ -72,8 +75,36 @@ public class UserController {
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public User Login(@RequestBody User user) {
-        return userService.Login(user.getForname(), user.getPassword());
+    public User Login(@RequestBody User user) throws UserNotFoundException, UserDisabledException {
+
+        User DBUser = userService.Login(user.getForname(), user.getPassword());
+
+        if (DBUser == null) {
+            throw new UserNotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
+        } else if (!DBUser.isActivated()) {
+            throw new UserDisabledException("Het account waamee je probeert in te loggen is uitgeschakeld, " +
+                    "vraag de brandmeester om deze te activeren");
+        }
+
+        return DBUser;
+    }
+
+    @RequestMapping(path = "/activate-user/{id}/{is-activated}", method = RequestMethod.GET)
+    public boolean ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
+
+        User DBUser = userService.GetByID(id);
+
+        if (DBUser == null) {
+            throw new UserNotFoundException("De gebruiker die je wilt activeren staat niet meer in het systeem");
+        }
+
+        DBUser.setActivated(true);
+        userService.Save(DBUser);
+
+        this.mailService.SendUserActivatedMail(DBUser.getEmailadres(),DBUser.getEmailadres(), DBUser.getForname());
+
+        return true;
+
     }
 
     //region Register methods
@@ -107,20 +138,31 @@ public class UserController {
      * @throws AlreadyExistException
      */
     @RequestMapping(path = "/registerconformation/{randomstring}", method = RequestMethod.GET)
-    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException {
+    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException, LinkExpiredException {
         RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
 
-        try {
-            if (corospondingrequest != null) {
-                userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(), corospondingrequest.getSurname(), corospondingrequest.getPassword()));
-                registerRequestService.Delete(corospondingrequest);
-            }
-            return true;
-        } catch (Exception ex) {
-            throw new AlreadyExistException("Er bestaat al een gebruiker met dit emailadres");
+
+        if (corospondingrequest == null) {
+            throw new LinkExpiredException("De gebruikte link is ongeldig of verlopen.");
+        } else if (userService.GetByMail(corospondingrequest.getEmailadres()) != null) {
+            throw new AlreadyExistException("Er is al een account met dit emailadres, het is mogelijk om een nieuw"
+                    + " wachtwoord op te vragen.");
         }
 
+        userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(),
+                corospondingrequest.getSurname(), corospondingrequest.getPassword()));
+        registerRequestService.Delete(corospondingrequest);
+
+        mailService.SendUserActivationMail("brandmeester@brandfonds.nl",
+                corospondingrequest.getEmailadres(), corospondingrequest.getForname() + " "
+                        + corospondingrequest.getSurname(),
+                (userService.GetByMail(corospondingrequest.getEmailadres()).getId()));
+        return true;
+
+
     }
+
+
     //endregion
 
     //region Edit passwords methods

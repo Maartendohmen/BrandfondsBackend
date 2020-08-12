@@ -16,7 +16,6 @@ public class PasswordChangeRequest {
     private String randomString;
     private Date initialdate;
 
-
     public PasswordChangeRequest()
     {
 

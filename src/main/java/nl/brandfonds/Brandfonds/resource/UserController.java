@@ -98,10 +98,12 @@ public class UserController {
             throw new UserNotFoundException("De gebruiker die je wilt activeren staat niet meer in het systeem");
         }
 
-        DBUser.setActivated(true);
-        userService.Save(DBUser);
+        if (!DBUser.isActivated()){
+            DBUser.setActivated(true);
+            userService.Save(DBUser);
 
-        this.mailService.SendUserActivatedMail(DBUser.getEmailadres(),DBUser.getEmailadres(), DBUser.getForname());
+            this.mailService.SendUserActivatedMail(DBUser.getEmailadres(),DBUser.getEmailadres(), DBUser.getForname());
+        }
 
         return true;
 

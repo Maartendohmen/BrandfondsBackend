@@ -1,6 +1,7 @@
 package nl.brandfonds.Brandfonds.resource;
 
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
+import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
@@ -24,6 +25,9 @@ public class DayController {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IStockService stockService;
 
     //region Get Stripes methods
 
@@ -131,6 +135,8 @@ public class DayController {
             dayService.Save(new Day(user, date, 0));
         }
         user.setSaldo(user.getSaldo() - 50);
+        stockService.RemoveOneFromStock();
+
         return dayService.AddStripe(date, userid);
     }
 
@@ -150,6 +156,8 @@ public class DayController {
             dayService.Save(new Day(user, date, 0));
         }
         user.setSaldo(user.getSaldo() - (amount * 50));
+        stockService.RemoveMultipleFromStock(amount);
+
         return dayService.AddMultipleStripes(amount, date, userid);
     }
 
@@ -167,9 +175,11 @@ public class DayController {
 
         if (specifiday != null && specifiday.getStripes() >= 2) {
             user.setSaldo(user.getSaldo() + 50);
+            stockService.AddOneToStock();
             return dayService.RemoveStripe(date, userid);
         } else if (specifiday != null) {
             user.setSaldo(user.getSaldo() + 50);
+            stockService.AddOneToStock();
             dayService.RemoveStripe(date, userid);
             dayService.Delete(specifiday);
             return 1;
@@ -192,9 +202,11 @@ public class DayController {
 
         if (specifiday != null && specifiday.getStripes() > amount) {
             user.setSaldo(user.getSaldo() + (amount * 50));
+            stockService.AddMultipleToStock(amount);
             return dayService.RemoveMultipleStripes(amount, date, userid);
         } else if (specifiday != null) {
             user.setSaldo(user.getSaldo() + (amount * 50));
+            stockService.AddMultipleToStock(amount);
             dayService.RemoveMultipleStripes(amount, date, userid);
             dayService.Delete(specifiday);
             return 1;

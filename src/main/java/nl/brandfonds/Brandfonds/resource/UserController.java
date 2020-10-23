@@ -9,18 +9,19 @@ import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.model.util.SHA256;
-import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
-import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
-import nl.brandfonds.Brandfonds.repository.UserRepository;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
+import nl.brandfonds.Brandfonds.security.AuthenticationRequest;
+import nl.brandfonds.Brandfonds.security.AuthenticationResponse;
+import nl.brandfonds.Brandfonds.security.JwtUtil;
+import nl.brandfonds.Brandfonds.security.MyUserDetailsServer;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.List;
 
@@ -32,16 +33,13 @@ public class UserController {
     IUserService userService;
 
     @Autowired
-    IRegisterRequestService registerRequestService;
-
-    @Autowired
-    IPasswordChangeRequestService passwordChangeRequestService;
-
-    @Autowired
     IDepositRequestService depositRequestService;
 
     @Autowired
     IMailService mailService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @RequestMapping(method = RequestMethod.GET)
     public List<User> getAll() {
@@ -52,7 +50,6 @@ public class UserController {
     public void Save(@RequestBody User user) {
         userService.Save(user);
     }
-
 
     //#exception handling implemented
     @RequestMapping(path = "/{id}/saldo", method = RequestMethod.GET)
@@ -74,21 +71,6 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public User Login(@RequestBody User user) throws UserNotFoundException, UserDisabledException {
-
-        User DBUser = userService.Login(user.getForname(), user.getPassword());
-
-        if (DBUser == null) {
-            throw new UserNotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
-        } else if (!DBUser.isActivated()) {
-            throw new UserDisabledException("Het account waamee je probeert in te loggen is uitgeschakeld, " +
-                    "vraag de brandmeester om deze te activeren");
-        }
-
-        return DBUser;
-    }
-
     @RequestMapping(path = "/activate-user/{id}/{is-activated}", method = RequestMethod.GET)
     public boolean ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
 
@@ -108,124 +90,6 @@ public class UserController {
         return true;
 
     }
-
-    //region Register methods
-
-    /**
-     * Create a registerrequest for a user
-     *
-     * @param user The user object that is gonna be created
-     * @return boolean if transaction was succesfull
-     */
-    @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public boolean Register(@RequestBody User user) {
-
-        try {
-            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(), user.getSurname(), user.getPassword());
-            registerRequestService.Save(request);
-
-            mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
-            return true;
-        } catch (Exception x) {
-            System.out.println(x);
-        }
-        return false;
-    }
-
-    /**
-     * Confirm account creation and create account
-     *
-     * @param randomstring The string that has to match the registerrequest string
-     * @return boolean if transaction was succesfull
-     * @throws AlreadyExistException
-     */
-    @RequestMapping(path = "/registerconformation/{randomstring}", method = RequestMethod.GET)
-    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException, LinkExpiredException {
-        RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
-
-
-        if (corospondingrequest == null) {
-            throw new LinkExpiredException("De gebruikte link is ongeldig of verlopen.");
-        } else if (userService.GetByMail(corospondingrequest.getEmailadres()) != null) {
-            throw new AlreadyExistException("Er is al een account met dit emailadres, het is mogelijk om een nieuw"
-                    + " wachtwoord op te vragen.");
-        }
-
-        userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(),
-                corospondingrequest.getSurname(), corospondingrequest.getPassword()));
-        registerRequestService.Delete(corospondingrequest);
-
-        mailService.SendUserActivationMail("brandmeester@brandfonds.nl",
-                corospondingrequest.getEmailadres(), corospondingrequest.getForname() + " "
-                        + corospondingrequest.getSurname(),
-                (userService.GetByMail(corospondingrequest.getEmailadres()).getId()));
-        return true;
-
-
-    }
-
-
-    //endregion
-
-    //region Edit passwords methods
-
-    /**
-     * Request password change --> create passwordChangeRequest and and sends mail to user.
-     *
-     * @param mailadres Mailadres for sending link to.
-     * @return
-     */
-    @RequestMapping(path = "/forgotpassword/{mailadres}", method = RequestMethod.GET)
-    public boolean ForgotPassword(@PathVariable("mailadres") String mailadres) throws UserNotFoundException {
-
-        if (userService.GetByMail(mailadres) != null) {
-
-            PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
-            passwordChangeRequestService.Save(request);
-
-            mailService.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
-            return true;
-        }
-
-        throw new UserNotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
-    }
-
-    /**
-     * Check if string provided by user is valid.
-     *
-     * @param randomstring Random string to check
-     * @return
-     */
-    @RequestMapping(path = "/resetpasswordcode/{randomstring}", method = RequestMethod.GET)
-    public boolean CheckPasswordString(@PathVariable("randomstring") String randomstring) {
-        PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
-
-        if (request == null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Change password for user
-     *
-     * @param randomstring String which is used to get attached email
-     * @param password     New password provided for user
-     * @return
-     */
-    @RequestMapping(path = "/resetpassword/{randomstring}", method = RequestMethod.POST)
-    public boolean ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) {
-        try {
-            PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
-            userService.UpdatePassword(SHA256.SHA256(password), request.getEmailadres());
-            passwordChangeRequestService.Delete(request);
-            return true;
-        } catch (Exception x) {
-            return false;
-        }
-    }
-    //endregion
 
     //region Deposit methods
 

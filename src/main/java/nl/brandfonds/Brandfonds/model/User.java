@@ -2,7 +2,6 @@ package nl.brandfonds.Brandfonds.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import nl.brandfonds.Brandfonds.model.util.SHA256;
 
 import javax.persistence.*;
 
@@ -69,7 +68,7 @@ public class User {
     }
     @JsonProperty
     public void setPassword(String password) {
-        this.password = SHA256.SHA256(password);
+        this.password = password;
     }
 
     public long getSaldo() {

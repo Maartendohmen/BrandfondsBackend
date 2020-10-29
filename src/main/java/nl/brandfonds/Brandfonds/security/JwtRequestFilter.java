@@ -19,7 +19,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 
     @Autowired
-    private MyUserDetailsServer userDetailsServer;
+    private CustomUserDetailsServer userDetailsServer;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -38,10 +38,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = this.userDetailsServer.loadUserByUsername(username);
+            CustomUserDetails customUserDetails = (CustomUserDetails) this.userDetailsServer.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(jwt,userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            if (jwtUtil.validateToken(jwt,customUserDetails)) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }

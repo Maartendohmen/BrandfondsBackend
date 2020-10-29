@@ -1,29 +1,21 @@
 package nl.brandfonds.Brandfonds.resource;
 
+import io.jsonwebtoken.Claims;
 import nl.brandfonds.Brandfonds.abstraction.*;
-import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
-import nl.brandfonds.Brandfonds.exceptions.LinkExpiredException;
-import nl.brandfonds.Brandfonds.exceptions.UserDisabledException;
 import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
-import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
-import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.security.AuthenticationRequest;
-import nl.brandfonds.Brandfonds.security.AuthenticationResponse;
+import nl.brandfonds.Brandfonds.security.CustomUserDetails;
 import nl.brandfonds.Brandfonds.security.JwtUtil;
-import nl.brandfonds.Brandfonds.security.MyUserDetailsServer;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping(value = "/rest/user")
@@ -35,11 +27,25 @@ public class UserController {
     @Autowired
     IDepositRequestService depositRequestService;
 
-    @Autowired
-    IMailService mailService;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    JwtUtil jwtUtil;
+
+
+    private int GetIDFromJWT(String token) {
+        final int[] id = new int[1];
+        String cleantoken = token.replace("Bearer ", "");
+
+        jwtUtil.extractClaim(cleantoken, new Function<Claims, Object>() {
+            @Override
+            public Object apply(Claims claims) {
+                id[0] = (int) claims.get("id");
+                return id[0];
+            }
+        });
+
+        return id[0];
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<User> getAll() {
@@ -51,19 +57,26 @@ public class UserController {
         userService.Save(user);
     }
 
-    //#exception handling implemented
-    @RequestMapping(path = "/{id}/saldo", method = RequestMethod.GET)
-    public long GetUserSaldo(@PathVariable("id") Integer id) throws UserNotFoundException {
+
+    @RequestMapping(path = "/saldo/{id}", method = RequestMethod.GET)
+    public long GetUserSaldo(@PathVariable(value = "id", required = false) Integer id,
+                             @RequestHeader(name = "Authorization") String token) throws UserNotFoundException {
+
+        if (id == null) {
+            id = GetIDFromJWT(token);
+        }
+
         try {
             return userService.GetUserSaldo(id);
         } catch (AopInvocationException ex) {
             throw new UserNotFoundException("De gebruiker kan niet worden opgehaald");
         }
-
     }
 
-    @RequestMapping(path = "/{id}/saldo", method = RequestMethod.PUT)
-    public void SetUserSaldo(@PathVariable("id") Integer id, @RequestBody String amount) throws UserNotFoundException {
+
+    @RequestMapping(path = "/saldo/{id}", method = RequestMethod.PUT)
+    public void SetUserSaldo(@PathVariable("id") Integer id,
+                             @RequestBody String amount) throws UserNotFoundException {
         try {
             userService.SetUserSaldo(Long.parseLong(amount), id);
         } catch (Exception x) {
@@ -71,37 +84,20 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "/activate-user/{id}/{is-activated}", method = RequestMethod.GET)
-    public boolean ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
-
-        User DBUser = userService.GetByID(id);
-
-        if (DBUser == null) {
-            throw new UserNotFoundException("De gebruiker die je wilt activeren staat niet meer in het systeem");
-        }
-
-        if (!DBUser.isActivated()){
-            DBUser.setActivated(true);
-            userService.Save(DBUser);
-
-            this.mailService.SendUserActivatedMail(DBUser.getEmailadres(),DBUser.getEmailadres(), DBUser.getForname());
-        }
-
-        return true;
-
-    }
-
     //region Deposit methods
 
     /**
      * Create a deposit request to be validated by the brandmaster
      *
-     * @param id     The user id who creates the request
      * @param amount The amount of money that is requested
      * @return boolean if transaction was succesfull
      */
-    @RequestMapping(path = "/{id}/deposit", method = RequestMethod.POST)
-    public boolean SetDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) {
+    @RequestMapping(path = "/deposit", method = RequestMethod.POST)
+    public boolean SetDepositRequest(@RequestHeader(name = "Authorization") String token,
+                                     @RequestBody String amount) {
+
+        int id = GetIDFromJWT(token);
+
         try {
             depositRequestService.Save(new DepositRequest(userService.GetOne(id), Long.parseLong(amount)));
             return true;
@@ -119,6 +115,7 @@ public class UserController {
     public List<DepositRequest> GetDepositRequest() {
         return depositRequestService.GetAll();
     }
+
 
     /**
      * Approve a depositrequest from user

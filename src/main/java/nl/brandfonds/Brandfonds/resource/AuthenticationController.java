@@ -1,5 +1,6 @@
 package nl.brandfonds.Brandfonds.resource;
 
+import io.jsonwebtoken.Claims;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
 import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
 import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
@@ -12,19 +13,18 @@ import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.UserRole;
-import nl.brandfonds.Brandfonds.security.AuthenticationRequest;
-import nl.brandfonds.Brandfonds.security.AuthenticationResponse;
-import nl.brandfonds.Brandfonds.security.JwtUtil;
-import nl.brandfonds.Brandfonds.security.MyUserDetailsServer;
+import nl.brandfonds.Brandfonds.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.server.PathParam;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("rest/auth")
@@ -46,7 +46,7 @@ public class AuthenticationController {
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MyUserDetailsServer userDetailsService;
+    private CustomUserDetailsServer customUserDetailsService;
 
     @Autowired
     private JwtUtil jwtTokenUtil;
@@ -64,19 +64,30 @@ public class AuthenticationController {
             throw new UserNotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        //Add role for checking front-end
-        for (GrantedAuthority g : userDetails.getAuthorities()){
-            if (g.getAuthority() == "BRANDMASTER"){
-                return ResponseEntity.ok(new AuthenticationResponse(jwt, UserRole.BRANDMASTER));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+
+    }
+
+    @RequestMapping(path = "/authorize", method = RequestMethod.POST)
+    public String Authorize(@RequestHeader(name = "Authorization") String token) {
+
+        final String[] role = new String[1];
+
+        String cleantoken = token.replace("Bearer ", "");
+
+        jwtTokenUtil.extractClaim(cleantoken, new Function<Claims, Object>() {
+            @Override
+            public Object apply(Claims claims) {
+                role[0] = (String) claims.get("role");
+                return role[0];
             }
-        }
+        });
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, UserRole.NORMAL));
-
+        return role[0];
     }
 
     //region Register methods
@@ -194,6 +205,27 @@ public class AuthenticationController {
         }
     }
     //endregion
+
+
+    @RequestMapping(path = "/activate-user/{id}/{is-activated}", method = RequestMethod.GET)
+    public boolean ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
+
+        User DBUser = userService.GetByID(id);
+
+        if (DBUser == null) {
+            throw new UserNotFoundException("De gebruiker die je wilt activeren staat niet meer in het systeem");
+        }
+
+        if (!DBUser.isActivated()) {
+            DBUser.setActivated(true);
+            userService.Save(DBUser);
+
+            this.mailService.SendUserActivatedMail(DBUser.getEmailadres(), DBUser.getEmailadres(), DBUser.getForname());
+        }
+
+        return true;
+
+    }
 
 
 }

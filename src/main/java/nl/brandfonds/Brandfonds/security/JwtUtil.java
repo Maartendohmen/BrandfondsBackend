@@ -38,9 +38,13 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(CustomUserDetails customUserDetails){
         Map<String,Object> claims = new HashMap<>();
-        return createToken(claims,userDetails.getUsername());
+
+        claims.put("id", customUserDetails.getId());
+        claims.put("role", customUserDetails.getAuthorities().iterator().next().getAuthority());
+
+        return createToken(claims,customUserDetails.getUsername());
     }
 
     private String createToken(Map<String,Object> claims, String subject) {
@@ -49,9 +53,9 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, CustomUserDetails customUserDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(customUserDetails.getUsername()) && !isTokenExpired(token));
     }
 
 }

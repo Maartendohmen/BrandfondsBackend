@@ -1,23 +1,18 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.jsonwebtoken.Claims;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.responses.StripesMonth;
-import nl.brandfonds.Brandfonds.security.CustomUserDetails;
-import nl.brandfonds.Brandfonds.security.JwtUtil;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 
 @RestController
 @RequestMapping(value = "/rest/day")
@@ -31,25 +26,6 @@ public class DayController {
 
     @Autowired
     IStockService stockService;
-
-    @Autowired
-    JwtUtil jwtUtil;
-
-    private int GetIDFromJWT(String token) {
-        final int[] id = new int[1];
-        String cleantoken = token.replace("Bearer ", "");
-
-        jwtUtil.extractClaim(cleantoken, new Function<Claims, Object>() {
-            @Override
-            public Object apply(Claims claims) {
-                id[0] = (int) claims.get("id");
-                return id[0];
-            }
-        });
-
-        return id[0];
-    }
-
 
     //region Get Stripes methods
 
@@ -70,11 +46,7 @@ public class DayController {
      * @return
      */
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public List<Day> GetAllFromUser(@PathVariable(value = "id",required = false) Integer id,
-                                    @RequestHeader(name = "Authorization") String token) {
-        if (id == null){
-            id = GetIDFromJWT(token);
-        }
+    public List<Day> GetAllFromUser(@PathVariable(value = "id") Integer id) {
 
         return dayService.GetByUserID(id);
     }
@@ -82,17 +54,14 @@ public class DayController {
     /**
      * Get specific day by UserID and day
      *
-     * @param id id of user
-     * @param date   date to search for
+     * @param id   id of user
+     * @param date date to search for
      * @return
      */
     @RequestMapping(path = "/{id}/{date}", method = RequestMethod.GET)
-    public Day GetFromSingleUserByDate(@PathVariable(value = "id",required = false) Integer id,
-                                       @PathVariable("date") Date date,
-                                       @RequestHeader(name = "Authorization") String token) {
-        if (id == null){
-            id = GetIDFromJWT(token);
-        }
+    public Day GetFromSingleUserByDate(@PathVariable(value = "id") Integer id,
+                                       @PathVariable("date") Date date) {
+
 
         return dayService.GetByUserIDAndDate(date, id);
     }
@@ -103,14 +72,8 @@ public class DayController {
      * @param id id of user
      * @return number of total stripes
      */
-    @RequestMapping(path = "/totalstripes/{id}", method = RequestMethod.GET)
-    public int GetTotalStripes(@PathVariable("id") Integer id,
-                               @RequestHeader(name = "Authorization") String token) {
-
-        if (id == null){
-            id = GetIDFromJWT(token);
-        }
-
+    @RequestMapping(path = "/{id}/totalstripes", method = RequestMethod.GET)
+    public int GetTotalStripes(@PathVariable("id") Integer id) {
         try {
             return dayService.GetTotalStripesFromUser(id);
         }
@@ -125,10 +88,8 @@ public class DayController {
      *
      * @return Map with <date, amount of stripes>
      */
-    @RequestMapping(path = "/sortedbymonth", method = RequestMethod.GET)
-    public List<StripesMonth> GetTotalStripesPerMonth(@RequestHeader(name = "Authorization") String token) {
-
-        int id = GetIDFromJWT(token);
+    @RequestMapping(path = "/{id}/sortedbymonth", method = RequestMethod.GET)
+    public List<StripesMonth> GetTotalStripesPerMonth(@PathVariable("id") Integer id) {
 
         Map<String, Integer> sortedstripes = new HashMap<>();
         List<Day> alldays = dayService.GetByUserID(id);
@@ -151,7 +112,7 @@ public class DayController {
 
         List<StripesMonth> stripesMonths = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : sortedstripes.entrySet()) {
-            stripesMonths.add(new StripesMonth(entry.getKey(),entry.getValue()));
+            stripesMonths.add(new StripesMonth(entry.getKey(), entry.getValue()));
         }
 
         return stripesMonths;
@@ -164,18 +125,13 @@ public class DayController {
     /**
      * Adds a stripe for user on specific date
      *
-     * @param id id of user
-     * @param date   date of stripe
+     * @param id   id of user
+     * @param date date of stripe
      * @return
      */
     @RequestMapping(path = "/addstripe/{id}/{date}", method = RequestMethod.GET)
-    public int AddStripeForUser(@PathVariable(value = "id", required = false) Integer id,
-                                @PathVariable("date") Date date,
-                                @RequestHeader(name = "Authorization") String token) {
-
-        if (id == null){
-            id = GetIDFromJWT(token);
-        }
+    public int AddStripeForUser(@PathVariable(value = "id") Integer id,
+                                @PathVariable("date") Date date) {
 
         User user = userService.GetOne(id);
 
@@ -191,7 +147,7 @@ public class DayController {
     /**
      * Add multiple stripes for user on specfic date
      *
-     * @param id The id of the user which should be given stripes
+     * @param id     The id of the user which should be given stripes
      * @param date   The date of the day the stripes should be added to
      * @param amount The amount of stripes that should be added
      * @return The number of database rows that have been affected by this change
@@ -214,17 +170,13 @@ public class DayController {
     /**
      * Remove a stripe for user on specfic date
      *
-     * @param id The id of the user which should be removing stripe
-     * @param date   The date of the day the stripe should be removed from
+     * @param id   The id of the user which should be removing stripe
+     * @param date The date of the day the stripe should be removed from
      * @return The number of database rows that have been affected by this change
      */
     @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
     public int RemoveStripeForUser(@PathVariable("id") Integer id,
-                                   @PathVariable("date") Date date,
-                                   @RequestHeader(name = "Authorization") String token) {
-        if (id == null){
-            id = GetIDFromJWT(token);
-        }
+                                   @PathVariable("date") Date date) {
 
         User user = userService.GetOne(id);
         Day specifiday = dayService.GetByUserIDAndDate(date, id);
@@ -246,7 +198,7 @@ public class DayController {
     /**
      * Remove multiple stripes for user on specfic date
      *
-     * @param id The id of the user which should be removing stripes
+     * @param id     The id of the user which should be removing stripes
      * @param date   The date of the day the stripes should be removed from
      * @param amount The amount of stripes that should be removed
      * @return The number of database rows that have been affected by this change

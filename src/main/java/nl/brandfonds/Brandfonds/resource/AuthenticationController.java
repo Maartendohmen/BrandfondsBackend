@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
+import java.io.NotActiveException;
 import java.util.function.Function;
 
 @RestController
@@ -66,9 +67,13 @@ public class AuthenticationController {
 
         final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
+        if (!userDetails.isEnabled()){
+            throw new UserDisabledException("Het account waarmee je probeert in te loggen is uitgeschakeld, wacht of neem contact op met de brandmeester totdat je account is geactiveerd");
+        }
+
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, userService.GetByName(authenticationRequest.getUsername())));
 
     }
 
@@ -226,6 +231,5 @@ public class AuthenticationController {
         return true;
 
     }
-
 
 }

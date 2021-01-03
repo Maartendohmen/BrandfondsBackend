@@ -1,6 +1,5 @@
 package nl.brandfonds.Brandfonds;
 
-import nl.brandfonds.Brandfonds.model.util.CORSFilter;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -8,7 +7,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -55,16 +53,6 @@ public class BrandfondsApplication {
 		connector.setSecure(false);
 		connector.setRedirectPort(9012);
 		return connector;
-	}
-
-	@Bean
-	public FilterRegistrationBean corsFilterRegistration() {
-		FilterRegistrationBean registrationBean =
-				new FilterRegistrationBean(new CORSFilter());
-		registrationBean.setName("CORS Filter");
-		registrationBean.addUrlPatterns("/*");
-		registrationBean.setOrder(1);
-		return registrationBean;
 	}
 
 }

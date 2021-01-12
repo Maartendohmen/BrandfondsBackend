@@ -42,15 +42,16 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                     CorsConfiguration cors = new CorsConfiguration();
             cors.setAllowedOrigins(Arrays.asList("*"));
             cors.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
-            cors.setAllowedHeaders(Arrays.asList("*"));
+            cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
             return cors;
         })
                 .and()
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/rest/auth/**").permitAll()
+                .authorizeRequests().antMatchers("/rest/day/**","/rest/user/**","/rest/stock/**").authenticated()
+/*                .authorizeRequests().antMatchers("/rest/auth/**").permitAll()
 //                .and()
 //                .authorizeRequests().antMatchers("/rest/user/{id}/saldo").hasRole("BRANDMASTER")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated()*/
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

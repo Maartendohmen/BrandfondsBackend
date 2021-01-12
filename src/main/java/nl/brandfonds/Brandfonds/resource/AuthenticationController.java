@@ -1,6 +1,9 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.jsonwebtoken.Claims;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
 import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
 import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
@@ -12,20 +15,15 @@ import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.model.UserRole;
 import nl.brandfonds.Brandfonds.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-import java.io.NotActiveException;
-import java.util.function.Function;
 
 @RestController
 @RequestMapping("rest/auth")
@@ -47,15 +45,19 @@ public class AuthenticationController {
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    private CustomUserDetailsServer customUserDetailsService;
+    CustomUserDetailsServer customUserDetailsService;
 
     @Autowired
-    private JwtUtil jwtTokenUtil;
+    JwtUtil jwtTokenUtil;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManager;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
+    @ApiOperation(value = "Login", notes = "Logs in user using forname and password")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "User was successfully logged in")
+    })
     public ResponseEntity<?> Login(@RequestBody AuthenticationRequest authenticationRequest) throws UserNotFoundException, UserDisabledException {
 
         try {
@@ -67,7 +69,7 @@ public class AuthenticationController {
 
         final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
-        if (!userDetails.isEnabled()){
+        if (!userDetails.isEnabled()) {
             throw new UserDisabledException("Het account waarmee je probeert in te loggen is uitgeschakeld, wacht of neem contact op met de brandmeester totdat je account is geactiveerd");
         }
 
@@ -77,59 +79,34 @@ public class AuthenticationController {
 
     }
 
-    @RequestMapping(path = "/authorize", method = RequestMethod.POST)
-    public String Authorize(@RequestHeader(name = "Authorization") String token) {
-
-        final String[] role = new String[1];
-
-        String cleantoken = token.replace("Bearer ", "");
-
-        jwtTokenUtil.extractClaim(cleantoken, new Function<Claims, Object>() {
-            @Override
-            public Object apply(Claims claims) {
-                role[0] = (String) claims.get("role");
-                return role[0];
-            }
-        });
-
-        return role[0];
-    }
-
     //region Register methods
 
-    /**
-     * Create a registerrequest for a user
-     *
-     * @param user The user object that is gonna be created
-     * @return boolean if transaction was succesfull
-     */
-    @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public boolean Register(@RequestBody User user) {
+    @PostMapping(path = "/register")
+    @ApiOperation(value = "Register", notes = "Creates a register request for user and sends verification mail", response = Boolean.class)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "The registration request was successfully created", response = ResponseEntity.class)
+    })
+    public void Register(@RequestBody User user) {
 
         try {
             RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(),
                     user.getSurname(), passwordEncoder.encode(user.getPassword()));
             registerRequestService.Save(request);
-
             mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
-            return true;
         } catch (Exception x) {
             System.out.println(x);
         }
-        return false;
+
     }
 
-    /**
-     * Confirm account creation and create account
-     *
-     * @param randomstring The string that has to match the registerrequest string
-     * @return boolean if transaction was succesfull
-     * @throws AlreadyExistException
-     */
-    @RequestMapping(path = "/registerconformation/{randomstring}", method = RequestMethod.GET)
-    public boolean ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException, LinkExpiredException {
-        RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
 
+    @GetMapping(path = "/registerconformation/{randomstring}")
+    @ApiOperation(value = "Confirm Registration", notes = "Validates registration with generated string and sends activation request to brandmaster")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "The register request was successfully validated", response = ResponseEntity.class)
+    })
+    public void ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException, LinkExpiredException {
+        RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
 
         if (corospondingrequest == null) {
             throw new LinkExpiredException("De gebruikte link is ongeldig of verlopen.");
@@ -146,21 +123,18 @@ public class AuthenticationController {
                 corospondingrequest.getEmailadres(), corospondingrequest.getForname() + " "
                         + corospondingrequest.getSurname(),
                 (userService.GetByMail(corospondingrequest.getEmailadres()).getId()));
-        return true;
     }
 
     //endregion
 
     //region Edit passwords methods
 
-    /**
-     * Request password change --> create passwordChangeRequest and and sends mail to user.
-     *
-     * @param mailadres Mailadres for sending link to.
-     * @return
-     */
-    @RequestMapping(path = "/forgotpassword/{mailadres}", method = RequestMethod.GET)
-    public boolean ForgotPassword(@PathVariable("mailadres") String mailadres) throws UserNotFoundException {
+    @GetMapping(path = "/forgotpassword/{mailadres}")
+    @ApiOperation(value = "Forgot password", notes = "Checks if user exist and sends password change mail to corresponding mail address")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Mail was successfully send to corresponding address", response = Boolean.class)
+    })
+    public void ForgotPassword(@PathVariable("mailadres") String mailadres) throws UserNotFoundException {
 
         if (userService.GetByMail(mailadres) != null) {
 
@@ -168,52 +142,45 @@ public class AuthenticationController {
             passwordChangeRequestService.Save(request);
 
             mailService.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
-            return true;
+            return;
         }
 
         throw new UserNotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
     }
 
-    /**
-     * Check if string provided by user is valid.
-     *
-     * @param randomstring Random string to check
-     * @return
-     */
-    @RequestMapping(path = "/resetpasswordcode/{randomstring}", method = RequestMethod.GET)
-    public boolean CheckPasswordString(@PathVariable("randomstring") String randomstring) {
+
+    @GetMapping(path = "/resetpasswordcode/{randomstring}")
+    @ApiOperation(value = "Forgot password validation", notes = "Validated if given string is linked to password change request")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Change password string is validated", response = Boolean.class)
+    })
+    public void CheckPasswordLink(@PathVariable("randomstring") String randomstring) throws LinkExpiredException {
         PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
 
         if (request == null) {
-            return false;
+            throw new LinkExpiredException("De link die je probeert te gebruiken is verlopen");
         }
-
-        return true;
     }
 
-    /**
-     * Change password for user
-     *
-     * @param randomstring String which is used to get attached email
-     * @param password     New password provided for user
-     * @return
-     */
-    @RequestMapping(path = "/resetpassword/{randomstring}", method = RequestMethod.POST)
-    public boolean ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) {
-        try {
+
+    @PostMapping(path = "/resetpassword/{randomstring}")
+    @ApiOperation(value = "Change password", notes = "Changes password to new value")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Password was succesfully changed", response = Boolean.class)
+    })
+    public void ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) {
             PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
             userService.UpdatePassword(passwordEncoder.encode(password), request.getEmailadres());
             passwordChangeRequestService.Delete(request);
-            return true;
-        } catch (Exception x) {
-            return false;
-        }
     }
     //endregion
 
-
-    @RequestMapping(path = "/activate-user/{id}/{is-activated}", method = RequestMethod.GET)
-    public boolean ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
+    @GetMapping(path = "/activate-user/{id}/{is-activated}")
+    @ApiOperation(value = "Set user activation", notes = "Set user active/inactive")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "User status successfully updated")
+    })
+    public void ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
 
         User DBUser = userService.GetByID(id);
 
@@ -222,14 +189,11 @@ public class AuthenticationController {
         }
 
         if (!DBUser.isActivated()) {
-            DBUser.setActivated(true);
+            DBUser.setActivated(isActivated);
             userService.Save(DBUser);
 
             this.mailService.SendUserActivatedMail(DBUser.getEmailadres(), DBUser.getEmailadres(), DBUser.getForname());
         }
-
-        return true;
-
     }
 
 }

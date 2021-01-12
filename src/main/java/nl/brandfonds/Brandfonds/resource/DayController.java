@@ -1,5 +1,8 @@
 package nl.brandfonds.Brandfonds.resource;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
@@ -29,50 +32,39 @@ public class DayController {
 
     //region Get Stripes methods
 
-    /**
-     * Get all Days from all users
-     *
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
+    @ApiOperation(value = "All stripes", notes = "Get all stripes for all users")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripes successfully retrieved")
+    })
     public List<Day> getAll() {
         return dayService.GetAll();
     }
 
-    /**
-     * Get all stripe-days from a single user
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    @GetMapping(path = "/{id}")
+    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripes successfully retrieved")
+    })
     public List<Day> GetAllFromUser(@PathVariable(value = "id") Integer id) {
-
         return dayService.GetByUserID(id);
     }
 
-    /**
-     * Get specific day by UserID and day
-     *
-     * @param id   id of user
-     * @param date date to search for
-     * @return
-     */
-    @RequestMapping(path = "/{id}/{date}", method = RequestMethod.GET)
+    @GetMapping(path = "/{id}/{date}")
+    @ApiOperation(value = "All stripes for user for day", notes = "Get all stripes for one user on one day")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripes successfully retrieved")
+    })
     public Day GetFromSingleUserByDate(@PathVariable(value = "id") Integer id,
                                        @PathVariable("date") Date date) {
-
-
         return dayService.GetByUserIDAndDate(date, id);
     }
 
-    /**
-     * Get Total stripe number from user
-     *
-     * @param id id of user
-     * @return number of total stripes
-     */
-    @RequestMapping(path = "/{id}/totalstripes", method = RequestMethod.GET)
+    @GetMapping(path = "/{id}/totalstripes")
+    @ApiOperation(value = "Total stripes number", notes = "Get the total number of stripes for one person")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Total stripes successfully retrieved")
+    })
     public int GetTotalStripes(@PathVariable("id") Integer id) {
         try {
             return dayService.GetTotalStripesFromUser(id);
@@ -83,12 +75,11 @@ public class DayController {
         }
     }
 
-    /**
-     * Get all stripes from user coupled per month
-     *
-     * @return Map with <date, amount of stripes>
-     */
-    @RequestMapping(path = "/{id}/sortedbymonth", method = RequestMethod.GET)
+    @GetMapping(path = "/{id}/sortedbymonth")
+    @ApiOperation(value = "Stripes month", notes = "Get the total number of stripes combined with the month")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Total stripes/months successfully retrieved")
+    })
     public List<StripesMonth> GetTotalStripesPerMonth(@PathVariable("id") Integer id) {
 
         Map<String, Integer> sortedstripes = new HashMap<>();
@@ -122,14 +113,11 @@ public class DayController {
 
     //region Edit Stripes methods
 
-    /**
-     * Adds a stripe for user on specific date
-     *
-     * @param id   id of user
-     * @param date date of stripe
-     * @return
-     */
-    @RequestMapping(path = "/addstripe/{id}/{date}", method = RequestMethod.GET)
+    @GetMapping(path = "/addstripe/{id}/{date}")
+    @ApiOperation(value = "Add stripe user", notes = "Add a stripe for a specific user")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripe successfully added")
+    })
     public int AddStripeForUser(@PathVariable(value = "id") Integer id,
                                 @PathVariable("date") Date date) {
 
@@ -144,15 +132,11 @@ public class DayController {
         return dayService.AddStripe(date, id);
     }
 
-    /**
-     * Add multiple stripes for user on specfic date
-     *
-     * @param id     The id of the user which should be given stripes
-     * @param date   The date of the day the stripes should be added to
-     * @param amount The amount of stripes that should be added
-     * @return The number of database rows that have been affected by this change
-     */
-    @RequestMapping(path = "/addstripes/{id}/{date}", method = RequestMethod.PUT)
+    @PutMapping(path = "/addstripes/{id}/{date}")
+    @ApiOperation(value = "Add multiple stripes user", notes = "Add multiple stripes for one user")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripes successfully added")
+    })
     public int AddStripesForUser(@PathVariable("id") Integer id,
                                  @PathVariable("date") Date date,
                                  @RequestBody Integer amount) {
@@ -167,14 +151,11 @@ public class DayController {
         return dayService.AddMultipleStripes(amount, date, id);
     }
 
-    /**
-     * Remove a stripe for user on specfic date
-     *
-     * @param id   The id of the user which should be removing stripe
-     * @param date The date of the day the stripe should be removed from
-     * @return The number of database rows that have been affected by this change
-     */
-    @RequestMapping(path = "/removestripe/{id}/{date}", method = RequestMethod.GET)
+    @GetMapping(path = "/removestripe/{id}/{date}")
+    @ApiOperation(value = "remove stripe user", notes = "remove a stripe for a specific user")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripe successfully removed")
+    })
     public int RemoveStripeForUser(@PathVariable("id") Integer id,
                                    @PathVariable("date") Date date) {
 
@@ -195,15 +176,11 @@ public class DayController {
         return 0;
     }
 
-    /**
-     * Remove multiple stripes for user on specfic date
-     *
-     * @param id     The id of the user which should be removing stripes
-     * @param date   The date of the day the stripes should be removed from
-     * @param amount The amount of stripes that should be removed
-     * @return The number of database rows that have been affected by this change
-     */
-    @RequestMapping(path = "/removestripes/{id}/{date}", method = RequestMethod.PUT)
+    @PutMapping(path = "/removestripes/{id}/{date}")
+    @ApiOperation(value = "Remove multiple stripes user", notes = "Remove multiple stripes for one user")
+    @ApiResponses({
+            @ApiResponse(code= 200,message = "Stripes successfully added")
+    })
     public int RemoveStripesForUser(@PathVariable("id") Integer id,
                                     @PathVariable("date") Date date,
                                     @RequestBody Integer amount) {

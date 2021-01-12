@@ -2,7 +2,6 @@ package nl.brandfonds.Brandfonds.implementation;
 
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
-import nl.brandfonds.Brandfonds.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;

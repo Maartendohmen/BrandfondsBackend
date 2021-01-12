@@ -2,7 +2,6 @@ package nl.brandfonds.Brandfonds.abstraction;
 
 import nl.brandfonds.Brandfonds.model.User;
 
-
 import java.util.List;
 
 public interface IUserService{

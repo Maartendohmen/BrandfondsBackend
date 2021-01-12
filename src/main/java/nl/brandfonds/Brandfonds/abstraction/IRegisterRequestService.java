@@ -1,7 +1,5 @@
 package nl.brandfonds.Brandfonds.abstraction;
 
-import nl.brandfonds.Brandfonds.model.Day;
-import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 
 import java.util.List;

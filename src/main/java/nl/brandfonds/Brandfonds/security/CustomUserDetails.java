@@ -1,6 +1,5 @@
 package nl.brandfonds.Brandfonds.security;
 
-import nl.brandfonds.Brandfonds.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 

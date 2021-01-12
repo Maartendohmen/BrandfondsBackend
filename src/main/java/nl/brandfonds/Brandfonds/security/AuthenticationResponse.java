@@ -1,7 +1,6 @@
 package nl.brandfonds.Brandfonds.security;
 
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.model.UserRole;
 
 public class AuthenticationResponse {
 

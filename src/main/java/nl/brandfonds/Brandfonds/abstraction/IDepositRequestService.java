@@ -1,6 +1,5 @@
 package nl.brandfonds.Brandfonds.abstraction;
 
-import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
-import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
+import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

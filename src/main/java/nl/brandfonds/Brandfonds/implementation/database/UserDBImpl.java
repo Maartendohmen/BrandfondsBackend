@@ -1,13 +1,12 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
-import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
+import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.UserRole;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Service

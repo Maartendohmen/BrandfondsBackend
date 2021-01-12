@@ -1,7 +1,5 @@
-package nl.brandfonds.Brandfonds.model.util;
+package nl.brandfonds.Brandfonds.utils;
 
-import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
-import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-public class ScheduledTasks {
+public class SchedulesUtil {
 
     @Autowired
     PasswordChangeRequestRepository passwordChangeRequestRepository;

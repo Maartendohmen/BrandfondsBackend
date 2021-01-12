@@ -1,8 +1,7 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
-import nl.brandfonds.Brandfonds.model.Day;
-import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
+import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

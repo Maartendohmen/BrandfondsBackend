@@ -1,7 +1,6 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
 import nl.brandfonds.Brandfonds.abstraction.IDepositRequestService;
-import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.repository.DepositRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;

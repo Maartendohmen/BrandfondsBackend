@@ -1,7 +1,7 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
-import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
+import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.repository.DayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

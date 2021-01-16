@@ -20,18 +20,23 @@ public class Stock {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
+
     public Integer getCurrentBottles() {
         return currentBottles;
     }
+
     public void setCurrentBottles(Integer currentBottles) {
         this.currentBottles = currentBottles;
     }
+
     public Integer getReturnedBottles() {
         return returnedBottles;
     }
+
     public void setReturnedBottles(Integer returnedBottles) {
         this.returnedBottles = returnedBottles;
     }

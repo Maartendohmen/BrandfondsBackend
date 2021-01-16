@@ -10,14 +10,14 @@ import java.util.Date;
 @Entity
 public class PasswordChangeRequest {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Integer id;
     private String emailadres;
     private String randomString;
     private Date initialdate;
 
-    public PasswordChangeRequest()
-    {
+    public PasswordChangeRequest() {
 
     }
 
@@ -30,8 +30,12 @@ public class PasswordChangeRequest {
     public String getEmailadres() {
         return emailadres;
     }
+
     public String getRandomstring() {
         return randomString;
     }
-    public Date getInitialdate() {return  initialdate;}
+
+    public Date getInitialdate() {
+        return initialdate;
+    }
 }

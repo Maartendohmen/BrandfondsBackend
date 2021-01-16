@@ -24,10 +24,10 @@ public class CustomUserDetailsServer implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User retrievedUser = userService.GetByName(s);
 
-        if (retrievedUser != null)
-        {
+        if (userService.getByName(s).isPresent()) {
+            User retrievedUser = userService.getByName(s).get();
+
             //Build user Authority. some how a convert from your custom roles which are in database to spring GrantedAuthority
             List<GrantedAuthority> authorities = buildUserAuthority(retrievedUser.getUserRole());
 

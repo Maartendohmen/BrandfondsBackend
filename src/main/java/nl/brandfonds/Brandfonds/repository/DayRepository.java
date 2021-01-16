@@ -8,45 +8,46 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-public interface DayRepository extends JpaRepository<Day,Integer> {
+public interface DayRepository extends JpaRepository<Day, Integer> {
 
     //Get days based on user ID
     @Query("SELECT d FROM Day d WHERE user_id = ?1")
-    List<Day> GetByUserID(Integer id);
+    List<Day> getByUserID(Integer id);
 
     //Get days based on date
     @Query("SELECT d FROM Day d WHERE date = ?1")
-    List<Day> GetByDate(Date date);
+    List<Day> getByDate(Date date);
 
     //gets day from user by specific day
     @Query("SELECT d FROM Day d WHERE date = ?1 and user_id = ?2")
-    Day GetByUserIDAndDate(Date date,Integer id);
+    Optional<Day> getByUserIDAndDate(Date date, Integer id);
 
     //Add stripe based on user and date
     @Transactional
     @Modifying
     @Query("UPDATE Day SET stripes = stripes + 1 WHERE date= ?1 AND user_id = ?2")
-    int AddStripe(Date date, Integer id);
+    int addStripe(Date date, Integer id);
 
     //Remove stripe based on user and date
     @Transactional
     @Modifying
     @Query("UPDATE Day SET stripes = stripes - 1 WHERE date= ?1 AND user_id = ?2")
-    int RemoveStripe(Date date, Integer id);
+    int removeStripe(Date date, Integer id);
 
     @Transactional
     @Modifying
     @Query("UPDATE Day SET stripes = stripes + ?1 WHERE date = ?2 AND user_id = ?3")
-    int AddMultipleStripes(Integer amountOfStripes, Date date, Integer id);
+    int addMultipleStripes(Integer amountOfStripes, Date date, Integer id);
 
     @Transactional
     @Modifying
     @Query("UPDATE Day SET stripes = stripes - ?1 WHERE date = ?2 AND user_id = ?3")
-    int RemoveMultipleStripes(Integer amountOfStripes, Date date, Integer id);
+    int removeMultipleStripes(Integer amountOfStripes, Date date, Integer id);
 
 
     @Query("SELECT SUM(stripes) FROM Day WHERE user_id = ?1")
-    int GetTotalStripesFromUser(Integer id);
+    Optional<Integer> getTotalStripesFromUser(Integer id);
 
 }

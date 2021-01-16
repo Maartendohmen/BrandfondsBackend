@@ -9,7 +9,8 @@ import java.util.Date;
 @Entity
 public class DepositRequest {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Integer id;
     @OneToOne
     private User user;
@@ -32,18 +33,23 @@ public class DepositRequest {
     public Integer getId() {
         return id;
     }
+
     public User getUser() {
         return user;
     }
+
     public long getAmount() {
         return amount;
     }
+
     public Date getRequestDate() {
         return requestDate;
     }
+
     public Date getHandledDate() {
         return handledDate;
     }
+
     public boolean isAccepted() {
         return accepted;
     }
@@ -52,24 +58,28 @@ public class DepositRequest {
     public void setId(Integer id) {
         this.id = id;
     }
+
     public void setUser(User user) {
         this.user = user;
     }
+
     public void setAmount(long amount) {
         this.amount = amount;
     }
+
     public void setRequestDate(Date requestDate) {
         this.requestDate = requestDate;
     }
+
     public void setHandledDate(Date handledDate) {
         this.handledDate = handledDate;
     }
+
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
     }
 
-    public void ValidateRequest()
-    {
+    public void ValidateRequest() {
         this.handledDate = new Date();
         this.accepted = true;
     }

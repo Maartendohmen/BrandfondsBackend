@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RegisterRequestDBImpl implements IRegisterRequestService {
@@ -15,27 +16,27 @@ public class RegisterRequestDBImpl implements IRegisterRequestService {
     RegisterRequestRepository registerRequestRepository;
 
     @Override
-    public List<RegisterRequest> GetAll() {
+    public List<RegisterRequest> getAll() {
         return registerRequestRepository.findAll();
     }
 
     @Override
-    public RegisterRequest GetOne(Integer id) {
+    public RegisterRequest getOne(Integer id) {
         return registerRequestRepository.getOne(id);
     }
 
     @Override
-    public void Save(RegisterRequest registerRequest) {
+    public void save(RegisterRequest registerRequest) {
         registerRequestRepository.save(registerRequest);
     }
 
     @Override
-    public void Delete(RegisterRequest registerRequest) {
+    public void delete(RegisterRequest registerRequest) {
         registerRequestRepository.delete(registerRequest);
     }
 
     @Override
-    public RegisterRequest GetByrandomString(String randomString) {
-        return registerRequestRepository.GetByrandomString(randomString);
+    public Optional<RegisterRequest> getByrandomString(String randomString) {
+        return registerRequestRepository.getByrandomString(randomString);
     }
 }

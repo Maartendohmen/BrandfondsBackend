@@ -4,30 +4,29 @@ import nl.brandfonds.Brandfonds.model.Day;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface IDayService {
 
-    public abstract List<Day> GetAll();
+    List<Day> getAll();
 
-    public abstract Day GetOne(Integer id);
+    Optional<Day> getOne(Integer id);
 
-    public abstract void Save(Day day);
+    void save(Day day);
 
-    public abstract void Delete(Day day);
+    void delete(Day day);
 
-    public  abstract List<Day> GetByUserID(Integer id);
+    List<Day> getByUserID(Integer id);
 
-    public  abstract List<Day> GetByDate(Date date);
+    Optional<Day> getByUserIDAndDate(Date date, Integer id);
 
-    public  abstract Day GetByUserIDAndDate(Date date,Integer id);
+    Optional<Integer> getTotalStripesFromUser(Integer id);
 
-    public  abstract int AddStripe(Date date, Integer id);
+    int addStripe(Date date, Integer id);
 
-    public  abstract int RemoveStripe(Date date, Integer id);
+    int removeStripe(Date date, Integer id);
 
-    public  abstract int AddMultipleStripes(Integer amountOfStripes, Date date, Integer id);
+    int addMultipleStripes(Integer amountOfStripes, Date date, Integer id);
 
-    public  abstract int RemoveMultipleStripes(Integer amountOfStripes, Date date, Integer id);
-
-    public  abstract int GetTotalStripesFromUser(Integer id);
+    int removeMultipleStripes(Integer amountOfStripes, Date date, Integer id);
 }

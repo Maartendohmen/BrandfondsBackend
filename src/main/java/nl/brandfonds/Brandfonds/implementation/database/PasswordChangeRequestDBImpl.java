@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestService {
@@ -15,27 +16,27 @@ public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestServic
     PasswordChangeRequestRepository passwordChangeRequestRepository;
 
     @Override
-    public List<PasswordChangeRequest> GetAll() {
+    public List<PasswordChangeRequest> getAll() {
         return passwordChangeRequestRepository.findAll();
     }
 
     @Override
-    public PasswordChangeRequest GetOne(Integer id) {
+    public PasswordChangeRequest getOne(Integer id) {
         return passwordChangeRequestRepository.getOne(id);
     }
 
     @Override
-    public void Save(PasswordChangeRequest passwordChangeRequest) {
+    public void save(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.save(passwordChangeRequest);
     }
 
     @Override
-    public void Delete(PasswordChangeRequest passwordChangeRequest) {
+    public void delete(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.delete(passwordChangeRequest);
     }
 
     @Override
-    public PasswordChangeRequest GetByrandomString(String randomString) {
-        return passwordChangeRequestRepository.GetByrandomString(randomString);
+    public Optional<PasswordChangeRequest> getByrandomString(String randomString) {
+        return passwordChangeRequestRepository.getByrandomString(randomString);
     }
 }

@@ -6,31 +6,33 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-    public interface UserRepository extends JpaRepository<User,Integer> {
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE forname = ?1 AND password = ?2")
-    User Login(String username,String password);
+    Optional<User> login(String username, String password);
 
     @Query("SELECT u FROM User u WHERE id = ?1")
-    User GetByID(Integer id);
+    Optional<User> getByID(Integer id);
 
     @Query("SELECT u FROM User u WHERE emailadres = ?1")
-    User GetByMail(String mail);
+    Optional<User> getByMail(String mail);
 
     @Query("SELECT u FROM User u WHERE forname = ?1")
-    User GetByName(String name);
+    Optional<User> getByName(String name);
 
     @Query("SELECT saldo FROM User WHERE id = ?1")
-    long GetUserSaldo(Integer id);
+    long getUserSaldo(Integer id);
 
     @Transactional
     @Modifying
     @Query("UPDATE User SET saldo= ?1 WHERE id= ?2")
-    void SetUserSaldo(Long amount,Integer id);
+    void setUserSaldo(Long amount, Integer id);
 
     @Transactional
     @Modifying
     @Query("UPDATE User SET password= ?1 WHERE emailadres= ?2")
-    void UpdatePassword(String newpassword, String emailadres);
+    void updatePassword(String newpassword, String emailadres);
 
 }

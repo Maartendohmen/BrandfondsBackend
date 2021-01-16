@@ -10,7 +10,8 @@ import java.util.Date;
 @Entity
 public class RegisterRequest {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Integer id;
     private String randomString;
     private Date initialdate;
@@ -22,6 +23,7 @@ public class RegisterRequest {
 
     public RegisterRequest() {
     }
+
     public RegisterRequest(String emailadres, String forname, String surname, String password) {
         this.randomString = RandomStringUtils.randomAlphanumeric(15);
         this.initialdate = new Date();
@@ -34,6 +36,7 @@ public class RegisterRequest {
     public String getRandomString() {
         return randomString;
     }
+
     public void setRandomString(String randomString) {
         this.randomString = randomString;
     }
@@ -45,6 +48,7 @@ public class RegisterRequest {
     public String getEmailadres() {
         return emailadres;
     }
+
     public void setEmailadres(String emailadres) {
         this.emailadres = emailadres;
     }
@@ -52,6 +56,7 @@ public class RegisterRequest {
     public String getForname() {
         return forname;
     }
+
     public void setForname(String forname) {
         this.forname = forname;
     }
@@ -59,6 +64,7 @@ public class RegisterRequest {
     public String getSurname() {
         return surname;
     }
+
     public void setSurname(String surname) {
         this.surname = surname;
     }
@@ -66,6 +72,7 @@ public class RegisterRequest {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }

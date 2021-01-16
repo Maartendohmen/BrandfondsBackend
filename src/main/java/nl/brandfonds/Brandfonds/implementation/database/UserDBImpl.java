@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserDBImpl implements IUserService {
@@ -16,7 +17,7 @@ public class UserDBImpl implements IUserService {
     UserRepository userRepository;
 
     @Override
-    public List<User> GetAll() {
+    public List<User> getAll() {
         List<User> users = userRepository.findAll();
 
         users.removeIf(value -> value.getUserRole() == UserRole.BRANDMASTER);
@@ -25,52 +26,42 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
-    public User GetByID(Integer id) {
-        return userRepository.GetByID(id);
+    public Optional<User> getByID(Integer id) {
+        return userRepository.findById(id);
     }
 
     @Override
-    public User GetOne(Integer id) {
-        return userRepository.getOne(id);
-    }
-
-    @Override
-    public void Save(User user) {
+    public void save(User user) {
         userRepository.save(user);
     }
 
     @Override
-    public void Delete(User user) {
+    public void delete(User user) {
         userRepository.delete(user);
     }
 
     @Override
-    public User Login(String username, String password) {
-        return userRepository.Login(username,password);
+    public Optional<User> getByMail(String mail) {
+        return userRepository.getByMail(mail);
     }
 
     @Override
-    public User GetByMail(String mail) {
-        return userRepository.GetByMail(mail);
+    public Optional<User> getByName(String name) {
+        return userRepository.getByName(name);
     }
 
     @Override
-    public User GetByName(String name) {
-        return userRepository.GetByName(name);
+    public long getUserSaldo(Integer id) {
+        return userRepository.getUserSaldo(id);
     }
 
     @Override
-    public long GetUserSaldo(Integer id) {
-        return userRepository.GetUserSaldo(id);
+    public void setUserSaldo(Long amount, Integer id) {
+        userRepository.setUserSaldo(amount, id);
     }
 
     @Override
-    public void SetUserSaldo(Long amount, Integer id) {
-        userRepository.SetUserSaldo(amount,id);
-    }
-
-    @Override
-    public void UpdatePassword(String newpassword, String emailadres) {
-        userRepository.UpdatePassword(newpassword, emailadres);
+    public void updatePassword(String newpassword, String emailadres) {
+        userRepository.updatePassword(newpassword, emailadres);
     }
 }

@@ -10,6 +10,7 @@ public class ErrorMessage {
 
     public ErrorMessage() {
     }
+
     public ErrorMessage(Date timestamp, String message, String type) {
         this.timestamp = timestamp;
         this.message = message;
@@ -19,9 +20,11 @@ public class ErrorMessage {
     public Date getTimestamp() {
         return timestamp;
     }
+
     public String getMessage() {
         return message;
     }
+
     public String getType() {
         return type;
     }
@@ -29,9 +32,11 @@ public class ErrorMessage {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+
     public void setMessage(String message) {
         this.message = message;
     }
+
     public void setType(String type) {
         this.type = type;
     }

@@ -3,14 +3,15 @@ package nl.brandfonds.Brandfonds.abstraction;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IDepositRequestService {
 
-    public abstract List<DepositRequest> GetAll();
+    List<DepositRequest> getAll();
 
-    public abstract DepositRequest GetOne(Integer id);
+    Optional<DepositRequest> getByID(Integer id);
 
-    public abstract void Save(DepositRequest depositRequest);
+    void save(DepositRequest depositRequest);
 
-    public abstract void Delete(DepositRequest depositRequest);
+    void delete(DepositRequest depositRequest);
 }

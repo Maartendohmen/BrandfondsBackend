@@ -18,13 +18,14 @@ public class User {
     private String forname;
     private String surname;
     private String password;
-    @Column(columnDefinition="double")
+    @Column(columnDefinition = "double")
     private long saldo; //in cents
     private boolean activated;
 
     public User() {
     }
-    public User(String emailadres,String forname, String surname, String password) {
+
+    public User(String emailadres, String forname, String surname, String password) {
         this.emailadres = emailadres;
         this.forname = forname;
         this.surname = surname;
@@ -37,6 +38,7 @@ public class User {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -44,6 +46,7 @@ public class User {
     public String getEmailadres() {
         return emailadres;
     }
+
     public void setEmailadres(String emailadres) {
         this.emailadres = emailadres;
     }
@@ -51,6 +54,7 @@ public class User {
     public String getForname() {
         return forname;
     }
+
     public void setForname(String forname) {
         this.forname = forname;
     }
@@ -58,6 +62,7 @@ public class User {
     public String getSurname() {
         return surname;
     }
+
     public void setSurname(String surname) {
         this.surname = surname;
     }
@@ -66,6 +71,7 @@ public class User {
     public String getPassword() {
         return password;
     }
+
     @JsonProperty
     public void setPassword(String password) {
         this.password = password;
@@ -74,6 +80,7 @@ public class User {
     public long getSaldo() {
         return saldo;
     }
+
     public void setSaldo(long saldo) {
         this.saldo = saldo;
     }
@@ -81,6 +88,7 @@ public class User {
     public UserRole getUserRole() {
         return userRole;
     }
+
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
@@ -88,6 +96,7 @@ public class User {
     public boolean isActivated() {
         return activated;
     }
+
     public void setActivated(boolean activated) {
         this.activated = activated;
     }

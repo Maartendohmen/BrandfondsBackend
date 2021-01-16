@@ -6,40 +6,42 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface StockRepository extends JpaRepository<Stock,Integer> {
+import java.util.Optional;
+
+public interface StockRepository extends JpaRepository<Stock, Integer> {
 
     @Query("SELECT s FROM Stock s WHERE id = 1")
-    Stock GetStock();
+    Optional<Stock> getStock();
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= ?1 where id = 1")
-    int UpdateCurrentBottles(Integer amount);
+    int updateCurrentBottles(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET returnedBottles= ?1 where id = 1")
-    int UpdateReturnedBottles(Integer amount);
+    int updateReturnedBottles(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles + 1 where id = 1")
-    int AddOneToStock();
+    int addOneToStock();
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles - 1 where id = 1")
-    int RemoveOneFromStock();
+    int removeOneFromStock();
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles + ?1 where id = 1")
-    int AddMultipleToStock(Integer amount);
+    int addMultipleToStock(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles - ?1 where id = 1")
-    int RemoveMultipleFromStock(Integer amount);
+    int removeMultipleFromStock(Integer amount);
 
 
 }

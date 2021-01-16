@@ -3,17 +3,18 @@ package nl.brandfonds.Brandfonds.abstraction;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IRegisterRequestService {
 
-    public abstract List<RegisterRequest> GetAll();
+    List<RegisterRequest> getAll();
 
-    public abstract RegisterRequest GetOne(Integer id);
+    RegisterRequest getOne(Integer id);
 
-    public abstract void Save(RegisterRequest registerRequest);
+    void save(RegisterRequest registerRequest);
 
-    public abstract void Delete(RegisterRequest registerRequest);
+    void delete(RegisterRequest registerRequest);
 
-    public abstract RegisterRequest GetByrandomString(String randomString);
+    Optional<RegisterRequest> getByrandomString(String randomString);
 
 }

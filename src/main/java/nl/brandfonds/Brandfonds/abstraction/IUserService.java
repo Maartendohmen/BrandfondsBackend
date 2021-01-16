@@ -3,29 +3,25 @@ package nl.brandfonds.Brandfonds.abstraction;
 import nl.brandfonds.Brandfonds.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface IUserService{
+public interface IUserService {
 
-    public abstract List<User> GetAll();
+    List<User> getAll();
 
-    public abstract User GetByID(Integer id);
+    void save(User user);
 
-    public abstract User GetOne(Integer id);
+    void delete(User user);
 
-    public abstract void Save(User user);
+    Optional<User> getByID(Integer id);
 
-    public abstract void Delete(User user);
+    Optional<User> getByMail(String mail);
 
-    public  abstract User Login(String username, String password);
+    Optional<User> getByName(String name);
 
-    public  abstract User GetByMail(String mail);
+    long getUserSaldo(Integer id);
 
-    public abstract User GetByName(String name);
+    void setUserSaldo(Long amount, Integer id);
 
-    public  abstract long GetUserSaldo(Integer id);
-
-    public  abstract void SetUserSaldo(Long amount,Integer id);
-
-
-    public  abstract void UpdatePassword(String newpassword, String emailadres);
+    void updatePassword(String newpassword, String emailadres);
 }

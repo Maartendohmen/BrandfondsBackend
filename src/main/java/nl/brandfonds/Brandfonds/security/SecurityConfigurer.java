@@ -39,15 +39,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors().configurationSource(request -> {
-                    CorsConfiguration cors = new CorsConfiguration();
+            CorsConfiguration cors = new CorsConfiguration();
             cors.setAllowedOrigins(Arrays.asList("*"));
-            cors.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+            cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
             return cors;
         })
                 .and()
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/rest/day/**","/rest/user/**","/rest/stock/**").authenticated()
+                .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**").authenticated()
 /*                .authorizeRequests().antMatchers("/rest/auth/**").permitAll()
 //                .and()
 //                .authorizeRequests().antMatchers("/rest/user/{id}/saldo").hasRole("BRANDMASTER")
@@ -64,7 +64,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

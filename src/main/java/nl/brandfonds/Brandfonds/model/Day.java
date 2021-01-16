@@ -9,7 +9,8 @@ import java.util.Date;
 @Entity
 public class Day {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Integer id;
     @OneToOne
     private User user;
@@ -28,6 +29,7 @@ public class Day {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -35,6 +37,7 @@ public class Day {
     public User getUser() {
         return user;
     }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -42,6 +45,7 @@ public class Day {
     public Date getDate() {
         return date;
     }
+
     public void setDate(Date date) {
         this.date = date;
     }
@@ -49,6 +53,7 @@ public class Day {
     public Integer getStripes() {
         return stripes;
     }
+
     public void setStripes(Integer stripes) {
         this.stripes = stripes;
     }

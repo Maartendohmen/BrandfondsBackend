@@ -3,14 +3,15 @@ package nl.brandfonds.Brandfonds.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class LinkExpiredException extends Exception {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class NotFoundException extends Exception {
 
-    public LinkExpiredException() {
+    public NotFoundException() {
 
     }
 
-    public LinkExpiredException(String message) {
+    public NotFoundException(String message) {
         super(message);
     }
+
 }

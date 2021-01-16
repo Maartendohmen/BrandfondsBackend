@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepositRequestDBImpl implements IDepositRequestService {
@@ -15,22 +16,22 @@ public class DepositRequestDBImpl implements IDepositRequestService {
     DepositRequestRepository depositRequestRepository;
 
     @Override
-    public List<DepositRequest> GetAll() {
+    public List<DepositRequest> getAll() {
         return depositRequestRepository.findAll();
     }
 
     @Override
-    public DepositRequest GetOne(Integer id) {
-        return depositRequestRepository.getOne(id);
+    public Optional<DepositRequest> getByID(Integer id) {
+        return depositRequestRepository.findById(id);
     }
 
     @Override
-    public void Save(DepositRequest depositRequest) {
+    public void save(DepositRequest depositRequest) {
         depositRequestRepository.save(depositRequest);
     }
 
     @Override
-    public void Delete(DepositRequest depositRequest) {
+    public void delete(DepositRequest depositRequest) {
         depositRequestRepository.delete(depositRequest);
     }
 }

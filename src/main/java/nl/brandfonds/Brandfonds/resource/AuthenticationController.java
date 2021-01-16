@@ -10,8 +10,8 @@ import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
 import nl.brandfonds.Brandfonds.exceptions.LinkExpiredException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.exceptions.UserDisabledException;
-import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
@@ -56,15 +56,17 @@ public class AuthenticationController {
     @PostMapping
     @ApiOperation(value = "Login", notes = "Logs in user using forname and password")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User was successfully logged in")
+            @ApiResponse(code = 200, message = "User was successfully logged in", response = AuthenticationResponse.class),
+            @ApiResponse(code = 403, message = "The user is set to inactive", response = ResponseEntity.class),
+            @ApiResponse(code = 404, message = "The user could not be found with the supplied credentials", response = ResponseEntity.class)
     })
-    public ResponseEntity<?> Login(@RequestBody AuthenticationRequest authenticationRequest) throws UserNotFoundException, UserDisabledException {
+    public AuthenticationResponse login(@RequestBody AuthenticationRequest authenticationRequest) throws UserDisabledException, NotFoundException {
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
                     authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            throw new UserNotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
+            throw new NotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
         }
 
         final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
@@ -75,28 +77,28 @@ public class AuthenticationController {
 
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, userService.GetByName(authenticationRequest.getUsername())));
+        return new AuthenticationResponse(jwt, userService.getByName(authenticationRequest.getUsername()).get());
 
     }
 
     //region Register methods
 
     @PostMapping(path = "/register")
-    @ApiOperation(value = "Register", notes = "Creates a register request for user and sends verification mail", response = Boolean.class)
+    @ApiOperation(value = "Register", notes = "Creates a register request for user and sends verification mail", response = ResponseEntity.class)
     @ApiResponses({
-            @ApiResponse(code = 200, message = "The registration request was successfully created", response = ResponseEntity.class)
+            @ApiResponse(code = 200, message = "The registration request was successfully created", response = ResponseEntity.class),
+            @ApiResponse(code = 409, message = "There is already a user registered with the same mail adres", response = ResponseEntity.class),
     })
-    public void Register(@RequestBody User user) {
+    public void register(@RequestBody User user) throws AlreadyExistException {
 
-        try {
-            RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(),
-                    user.getSurname(), passwordEncoder.encode(user.getPassword()));
-            registerRequestService.Save(request);
-            mailService.SendRegisterMail(request.getEmailadres(), request.getRandomString());
-        } catch (Exception x) {
-            System.out.println(x);
+        if (userService.getByMail(user.getEmailadres()).isPresent()) {
+            throw new AlreadyExistException("Er is al een account met dit emailadres, het is mogelijk om een nieuw wachtwoord op te vragen.");
         }
 
+        RegisterRequest request = new RegisterRequest(user.getEmailadres(), user.getForname(),
+                user.getSurname(), passwordEncoder.encode(user.getPassword()));
+        registerRequestService.save(request);
+        mailService.sendRegisterMail(request.getEmailadres(), request.getRandomString());
     }
 
 
@@ -104,25 +106,25 @@ public class AuthenticationController {
     @ApiOperation(value = "Confirm Registration", notes = "Validates registration with generated string and sends activation request to brandmaster")
     @ApiResponses({
             @ApiResponse(code = 200, message = "The register request was successfully validated", response = ResponseEntity.class)
+            //todo add response for link expired -> add correct code to exception class
     })
-    public void ConfirmRegistration(@PathVariable("randomstring") String randomstring) throws AlreadyExistException, LinkExpiredException {
-        RegisterRequest corospondingrequest = registerRequestService.GetByrandomString(randomstring);
+    public void confirmRegistration(@PathVariable("randomstring") String randomstring) throws LinkExpiredException {
 
-        if (corospondingrequest == null) {
-            throw new LinkExpiredException("De gebruikte link is ongeldig of verlopen.");
-        } else if (userService.GetByMail(corospondingrequest.getEmailadres()) != null) {
-            throw new AlreadyExistException("Er is al een account met dit emailadres, het is mogelijk om een nieuw"
-                    + " wachtwoord op te vragen.");
-        }
+        registerRequestService.getByrandomString(randomstring).ifPresent(request -> {
 
-        userService.Save(new User(corospondingrequest.getEmailadres(), corospondingrequest.getForname(),
-                corospondingrequest.getSurname(), corospondingrequest.getPassword()));
-        registerRequestService.Delete(corospondingrequest);
+            userService.save(new User(request.getEmailadres(), request.getForname(),
+                    request.getSurname(), request.getPassword()));
+            registerRequestService.delete(request);
 
-        mailService.SendUserActivationMail("brandmeester@brandfonds.nl",
-                corospondingrequest.getEmailadres(), corospondingrequest.getForname() + " "
-                        + corospondingrequest.getSurname(),
-                (userService.GetByMail(corospondingrequest.getEmailadres()).getId()));
+            mailService.sendUserActivationMail("brandmeester@brandfonds.nl",
+                    request.getEmailadres(), request.getForname() + " "
+                            + request.getSurname(),
+                    (userService.getByMail(request.getEmailadres()).get().getId()));
+
+            return;
+        });
+
+        throw new LinkExpiredException("De gebruikte link is ongeldig of verlopen.");
     }
 
     //endregion
@@ -132,32 +134,33 @@ public class AuthenticationController {
     @GetMapping(path = "/forgotpassword/{mailadres}")
     @ApiOperation(value = "Forgot password", notes = "Checks if user exist and sends password change mail to corresponding mail address")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Mail was successfully send to corresponding address", response = Boolean.class)
+            @ApiResponse(code = 200, message = "Mail was successfully send to corresponding address", response = ResponseEntity.class),
+            @ApiResponse(code = 404, message = "The provided emailadress is not found", response = ResponseEntity.class)
     })
-    public void ForgotPassword(@PathVariable("mailadres") String mailadres) throws UserNotFoundException {
+    public void forgotPassword(@PathVariable("mailadres") String mailadres) throws NotFoundException {
 
-        if (userService.GetByMail(mailadres) != null) {
+        userService.getByMail(mailadres).ifPresent(user -> {
+                    PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
+                    passwordChangeRequestService.save(request);
 
-            PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
-            passwordChangeRequestService.Save(request);
+                    mailService.sendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
+                    return;
+                }
+        );
 
-            mailService.SendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
-            return;
-        }
-
-        throw new UserNotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
+        throw new NotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
     }
 
 
     @GetMapping(path = "/resetpasswordcode/{randomstring}")
     @ApiOperation(value = "Forgot password validation", notes = "Validated if given string is linked to password change request")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Change password string is validated", response = Boolean.class)
+            @ApiResponse(code = 200, message = "Change password string is validated", response = ResponseEntity.class),
+            @ApiResponse(code = 401, message = "The token provided is expired/ not found", response = ResponseEntity.class)
+            //todo add response for link expired -> add correct code to exception class
     })
-    public void CheckPasswordLink(@PathVariable("randomstring") String randomstring) throws LinkExpiredException {
-        PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
-
-        if (request == null) {
+    public void checkPasswordLink(@PathVariable("randomstring") String randomstring) throws LinkExpiredException {
+        if (!passwordChangeRequestService.getByrandomString(randomstring).isPresent()) {
             throw new LinkExpiredException("De link die je probeert te gebruiken is verlopen");
         }
     }
@@ -166,34 +169,37 @@ public class AuthenticationController {
     @PostMapping(path = "/resetpassword/{randomstring}")
     @ApiOperation(value = "Change password", notes = "Changes password to new value")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Password was succesfully changed", response = Boolean.class)
+            @ApiResponse(code = 200, message = "Password was succesfully changed", response = ResponseEntity.class),
+            @ApiResponse(code = 401, message = "The token provided is expired/ not found", response = ResponseEntity.class)
     })
-    public void ChangePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) {
-            PasswordChangeRequest request = passwordChangeRequestService.GetByrandomString(randomstring);
-            userService.UpdatePassword(passwordEncoder.encode(password), request.getEmailadres());
-            passwordChangeRequestService.Delete(request);
+    public void changePassword(@PathVariable("randomstring") String randomstring, @RequestBody String password) throws LinkExpiredException {
+        passwordChangeRequestService.getByrandomString(randomstring).ifPresent(request -> {
+            userService.updatePassword(passwordEncoder.encode(password), request.getEmailadres());
+            passwordChangeRequestService.delete(request);
+        });
+        throw new LinkExpiredException("De link die je probeert te gebruiken is verlopen");
     }
     //endregion
+
 
     @GetMapping(path = "/activate-user/{id}/{is-activated}")
     @ApiOperation(value = "Set user activation", notes = "Set user active/inactive")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User status successfully updated")
+            @ApiResponse(code = 200, message = "User status successfully updated", response = ResponseEntity.class),
+            @ApiResponse(code = 404, message = "User could not be found", response = ResponseEntity.class)
     })
-    public void ActivateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserNotFoundException {
+    public void activateUser(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserDisabledException {
 
-        User DBUser = userService.GetByID(id);
+        userService.getByID(id).ifPresent(user -> {
+            user.setActivated(isActivated);
+            userService.save(user);
 
-        if (DBUser == null) {
-            throw new UserNotFoundException("De gebruiker die je wilt activeren staat niet meer in het systeem");
-        }
+            this.mailService.sendUserActivatedMail(user.getEmailadres(), user.getEmailadres(), user.getForname());
+            return;
+        });
 
-        if (!DBUser.isActivated()) {
-            DBUser.setActivated(isActivated);
-            userService.Save(DBUser);
+        throw new UserDisabledException("De gebruiker die je wilt activeren staat niet meer in het systeem");
 
-            this.mailService.SendUserActivatedMail(DBUser.getEmailadres(), DBUser.getEmailadres(), DBUser.getForname());
-        }
     }
 
 }

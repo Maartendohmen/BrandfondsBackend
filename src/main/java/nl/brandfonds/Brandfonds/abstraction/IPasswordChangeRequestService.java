@@ -3,16 +3,17 @@ package nl.brandfonds.Brandfonds.abstraction;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IPasswordChangeRequestService {
 
-     public abstract List<PasswordChangeRequest> GetAll();
+    List<PasswordChangeRequest> getAll();
 
-     public abstract PasswordChangeRequest GetOne(Integer id);
+    PasswordChangeRequest getOne(Integer id);
 
-     public abstract void Save(PasswordChangeRequest passwordChangeRequest);
+    void save(PasswordChangeRequest passwordChangeRequest);
 
-     public abstract void Delete(PasswordChangeRequest passwordChangeRequest);
+    void delete(PasswordChangeRequest passwordChangeRequest);
 
-     public  abstract PasswordChangeRequest GetByrandomString(String randomString);
+    Optional<PasswordChangeRequest> getByrandomString(String randomString);
 }

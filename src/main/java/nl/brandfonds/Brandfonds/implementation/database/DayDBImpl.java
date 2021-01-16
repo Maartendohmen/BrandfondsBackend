@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DayDBImpl implements IDayService {
@@ -17,62 +18,57 @@ public class DayDBImpl implements IDayService {
 
 
     @Override
-    public List<Day> GetAll() {
+    public List<Day> getAll() {
         return dayRepository.findAll();
     }
 
     @Override
-    public Day GetOne(Integer id) {
-        return dayRepository.getOne(id);
+    public Optional<Day> getOne(Integer id) {
+        return dayRepository.findById(id);
     }
 
     @Override
-    public void Save(Day day) {
+    public void save(Day day) {
         dayRepository.save(day);
     }
 
     @Override
-    public void Delete(Day day) {
+    public void delete(Day day) {
         dayRepository.delete(day);
     }
 
     @Override
-    public List<Day> GetByUserID(Integer id) {
-        return dayRepository.GetByUserID(id);
+    public List<Day> getByUserID(Integer id) {
+        return dayRepository.getByUserID(id);
     }
 
     @Override
-    public List<Day> GetByDate(Date date) {
-        return dayRepository.GetByDate(date);
+    public Optional<Day> getByUserIDAndDate(Date date, Integer id) {
+        return dayRepository.getByUserIDAndDate(date, id);
     }
 
     @Override
-    public Day GetByUserIDAndDate(Date date, Integer id) {
-        return dayRepository.GetByUserIDAndDate(date, id);
+    public int addStripe(Date date, Integer id) {
+        return dayRepository.addStripe(date, id);
     }
 
     @Override
-    public int AddStripe(Date date, Integer id) {
-        return dayRepository.AddStripe(date, id);
+    public int removeStripe(Date date, Integer id) {
+        return dayRepository.removeStripe(date, id);
     }
 
     @Override
-    public int RemoveStripe(Date date, Integer id) {
-        return dayRepository.RemoveStripe(date, id);
+    public int addMultipleStripes(Integer amountOfStripes, Date date, Integer id) {
+        return dayRepository.addMultipleStripes(amountOfStripes, date, id);
     }
 
     @Override
-    public int AddMultipleStripes(Integer amountOfStripes, Date date, Integer id) {
-        return dayRepository.AddMultipleStripes(amountOfStripes, date, id);
+    public int removeMultipleStripes(Integer amountOfStripes, Date date, Integer id) {
+        return dayRepository.removeMultipleStripes(amountOfStripes, date, id);
     }
 
     @Override
-    public int RemoveMultipleStripes(Integer amountOfStripes, Date date, Integer id) {
-        return dayRepository.RemoveMultipleStripes(amountOfStripes, date, id);
-    }
-
-    @Override
-    public int GetTotalStripesFromUser(Integer id) {
-        return dayRepository.GetTotalStripesFromUser(id);
+    public Optional<Integer> getTotalStripesFromUser(Integer id) {
+        return dayRepository.getTotalStripesFromUser(id);
     }
 }

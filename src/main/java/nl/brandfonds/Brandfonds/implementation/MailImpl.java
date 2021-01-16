@@ -49,14 +49,14 @@ public class MailImpl implements IMailService {
     }
 
     @Value("${activateuser.ownurl}")
-    public void setACTIVATEUSERURL(String ACTIVATEUSERURL){
+    public void setACTIVATEUSERURL(String ACTIVATEUSERURL) {
         this.ACTIVATEUSERURL = ACTIVATEUSERURL;
     }
 
     //BE AWARE AVG MUST BE OFF BEFORE TESTING
 
-    public void SendRegisterMail(String receipent, String registrationCode) {
-        ReadInputProperties();
+    public void sendRegisterMail(String receipent, String registrationCode) {
+        readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
@@ -75,9 +75,9 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("registratielink",REGISTRATIONURL + registrationCode);
+                String newhtmlpage = data.replace("registratielink", REGISTRATIONURL + registrationCode);
 
-                message.setContent(newhtmlpage,"text/html");
+                message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
@@ -92,8 +92,8 @@ public class MailImpl implements IMailService {
 
     }
 
-    public void SendChangePasswordMail(String receipent, String forgotPasswordCode) {
-        ReadInputProperties();
+    public void sendChangePasswordMail(String receipent, String forgotPasswordCode) {
+        readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
@@ -112,9 +112,9 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("resetpasswordlink",FORGOTPASSWORDBASEURL + forgotPasswordCode);
+                String newhtmlpage = data.replace("resetpasswordlink", FORGOTPASSWORDBASEURL + forgotPasswordCode);
 
-                message.setContent(newhtmlpage,"text/html");
+                message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
@@ -128,8 +128,8 @@ public class MailImpl implements IMailService {
         t.start();
     }
 
-    public void SendUserActivationMail(String receipent,String email, String username, Integer id){
-        ReadInputProperties();
+    public void sendUserActivationMail(String receipent, String email, String username, Integer id) {
+        readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
@@ -148,11 +148,11 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("ACTIVATEUSERURL",ACTIVATEUSERURL + id);
-                newhtmlpage = newhtmlpage.replace("USERNAME",username);
-                newhtmlpage = newhtmlpage.replace("MAILADRES",email);
+                String newhtmlpage = data.replace("ACTIVATEUSERURL", ACTIVATEUSERURL + id);
+                newhtmlpage = newhtmlpage.replace("USERNAME", username);
+                newhtmlpage = newhtmlpage.replace("MAILADRES", email);
 
-                message.setContent(newhtmlpage,"text/html");
+                message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
@@ -166,8 +166,8 @@ public class MailImpl implements IMailService {
         t.start();
     }
 
-    public void SendUserActivatedMail(String receipent,String email, String username){
-        ReadInputProperties();
+    public void sendUserActivatedMail(String receipent, String email, String username) {
+        readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
@@ -186,10 +186,10 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("USERNAME",username);
-                newhtmlpage = newhtmlpage.replace("MAILADRES",email);
+                String newhtmlpage = data.replace("USERNAME", username);
+                newhtmlpage = newhtmlpage.replace("MAILADRES", email);
 
-                message.setContent(newhtmlpage,"text/html");
+                message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
@@ -203,7 +203,7 @@ public class MailImpl implements IMailService {
         t.start();
     }
 
-    private void ReadInputProperties() {
+    private void readInputProperties() {
         mailproperties = new Properties();
 
         InputStream input = null;

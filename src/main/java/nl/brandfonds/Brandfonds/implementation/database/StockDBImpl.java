@@ -6,6 +6,8 @@ import nl.brandfonds.Brandfonds.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class StockDBImpl implements IStockService {
 
@@ -14,37 +16,37 @@ public class StockDBImpl implements IStockService {
 
 
     @Override
-    public Stock GetStock() {
-        return stockRepository.GetStock();
+    public Optional<Stock> getStock() {
+        return stockRepository.getStock();
     }
 
     @Override
-    public int UpdateCurrentBottles(Integer amount) {
-        return stockRepository.UpdateCurrentBottles(amount);
+    public int updateCurrentBottles(Integer amount) {
+        return stockRepository.updateCurrentBottles(amount);
     }
 
     @Override
-    public int UpdateReturnedBottles(Integer amount) {
-        return stockRepository.UpdateReturnedBottles(amount);
+    public int updateReturnedBottles(Integer amount) {
+        return stockRepository.updateReturnedBottles(amount);
     }
 
     @Override
-    public int AddOneToStock() {
-        return stockRepository.AddOneToStock();
+    public int addOneToStock() {
+        return stockRepository.addOneToStock();
     }
 
     @Override
-    public int RemoveOneFromStock() {
-        return stockRepository.RemoveOneFromStock();
+    public int removeOneFromStock() {
+        return stockRepository.removeOneFromStock();
     }
 
     @Override
-    public int AddMultipleToStock(Integer amount) {
-        return stockRepository.AddMultipleToStock(amount);
+    public int addMultipleToStock(Integer amount) {
+        return stockRepository.addMultipleToStock(amount);
     }
 
     @Override
-    public int RemoveMultipleFromStock(Integer amount) {
-        return stockRepository.RemoveMultipleFromStock(amount);
+    public int removeMultipleFromStock(Integer amount) {
+        return stockRepository.removeMultipleFromStock(amount);
     }
 }

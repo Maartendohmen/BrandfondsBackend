@@ -2,11 +2,11 @@ package nl.brandfonds.Brandfonds.abstraction;
 
 public interface IMailService {
 
-    public abstract void SendRegisterMail(String receipent, String registrationCode);
+    void sendRegisterMail(String receipent, String registrationCode);
 
-    public abstract void SendChangePasswordMail(String receipent, String forgotPasswordCode);
+    void sendChangePasswordMail(String receipent, String forgotPasswordCode);
 
-    public abstract void SendUserActivationMail(String receipent,String email, String username, Integer id);
+    void sendUserActivationMail(String receipent, String email, String username, Integer id);
 
-    public abstract void SendUserActivatedMail(String receipent,String email, String username);
+    void sendUserActivatedMail(String receipent, String email, String username);
 }

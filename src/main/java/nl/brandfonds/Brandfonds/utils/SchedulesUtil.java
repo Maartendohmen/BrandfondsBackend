@@ -19,22 +19,22 @@ public class SchedulesUtil {
 
     //Check every 30 seconds if link is invalid
 
-    @Scheduled(fixedDelay = 30000)
-    public void DeletePasswordRequests() {
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void deletePasswordRequests() {
 
         passwordChangeRequestRepository.findAll().forEach(passwordChangeRequest -> {
             if (new Date().getTime() - passwordChangeRequest.getInitialdate().getTime() >= 20 * 60 * 1000
-                    ) {
+            ) {
                 passwordChangeRequestRepository.delete(passwordChangeRequest);
             }
         });
     }
 
-    @Scheduled(fixedDelay = 30000)
-    public void DeleteRegisterRequests() {
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void deleteRegisterRequests() {
         registerRequestRepository.findAll().forEach(registerRequest -> {
             if (new Date().getTime() - registerRequest.getInitialdate().getTime() >= 20 * 60 * 1000
-                    ) {
+            ) {
                 registerRequestRepository.delete(registerRequest);
             }
         });

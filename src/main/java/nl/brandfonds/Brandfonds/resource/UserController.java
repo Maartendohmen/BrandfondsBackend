@@ -5,11 +5,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import nl.brandfonds.Brandfonds.abstraction.IDepositRequestService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
-import nl.brandfonds.Brandfonds.exceptions.UserNotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -29,113 +29,102 @@ public class UserController {
     @GetMapping
     @ApiOperation(value = "Get users", notes = "Get all registered users")
     @ApiResponses({
-            @ApiResponse(code= 200,message = "Users successfully retrieved")
+            @ApiResponse(code = 200, message = "Users successfully retrieved", response = User.class, responseContainer = "List")
     })
     public List<User> getAll() {
-        return userService.GetAll();
+        return userService.getAll();
     }
 
     @PostMapping
     @ApiOperation(value = "Save user", notes = "Saves a user")
     @ApiResponses({
-            @ApiResponse(code= 200,message = "User was successfully saved")
+            @ApiResponse(code = 200, message = "User was successfully saved", response = ResponseEntity.class)
     })
-    public void Save(@RequestBody User user) {
-        userService.Save(user);
+    public void save(@RequestBody User user) {
+        userService.save(user);
     }
 
     @GetMapping(path = "/{id}/saldo")
-    @ApiOperation(value = "Get saldo user", notes = "Gets the saldo from a user")
+    @ApiOperation(value = "Get saldo user", notes = "Gets the saldo from a user", response = Long.class)
     @ApiResponses({
-            @ApiResponse(code= 200,message = "Saldo was successfully retrieved")
-    })
-    public long GetUserSaldo(@PathVariable(value = "id") Integer id) throws UserNotFoundException {
+            @ApiResponse(code = 200, message = "Saldo was successfully retrieved"),
+            @ApiResponse(code = 404, message = "The requested user could not be found"),
 
-        try {
-            return userService.GetUserSaldo(id);
-        } catch (AopInvocationException ex) {
-            throw new UserNotFoundException("De gebruiker kan niet worden opgehaald");
+    })
+    public long getUserSaldo(@PathVariable(value = "id") Integer id) throws NotFoundException {
+
+        if (!userService.getByID(id).isPresent()) {
+            throw new NotFoundException("De gebruiker kan niet worden gevonden");
         }
+
+        return userService.getUserSaldo(id);
     }
 
     @PutMapping(path = "/saldo/{id}")
-    @ApiOperation(value = "Update user saldo", notes = "Updates the current saldo of a user")
+    @ApiOperation(value = "Update user saldo", notes = "Updates the current saldo of a user", response = ResponseEntity.class)
     @ApiResponses({
-            @ApiResponse(code= 200,message = "Saldo was successfully updated")
+            @ApiResponse(code = 200, message = "Saldo was successfully updated"),
+            @ApiResponse(code = 404, message = "The requested user could not be found"),
     })
-    public void SetUserSaldo(@PathVariable("id") Integer id,
-                             @RequestBody String amount) throws UserNotFoundException {
-        try {
-            userService.SetUserSaldo(Long.parseLong(amount), id);
-        } catch (Exception x) {
-            throw new UserNotFoundException("Het veranderen van het saldo is mislukt, de gebruiker kan niet gevonden worden");
+    public void setUserSaldo(@PathVariable("id") Integer id,
+                             @RequestBody long amount) throws NotFoundException {
+
+        if (!userService.getByID(id).isPresent()) {
+            throw new NotFoundException("Het veranderen van het saldo is mislukt, de gebruiker kan niet gevonden worden");
         }
+
+        userService.setUserSaldo(amount, id);
     }
 
     //region Deposit methods
 
-    @PostMapping(path = "/{id/deposit")
-    @ApiOperation(value = "Create deposit request", notes = "Creates a deposit request with given amount")
+    @PostMapping(path = "/{id}/deposit")
+    @ApiOperation(value = "Create deposit request", notes = "Creates a deposit request with given amount", response = ResponseEntity.class)
     @ApiResponses({
-            @ApiResponse(code= 200,message = "Depositrequest was successfully created")
+            @ApiResponse(code = 200, message = "Depositrequest was successfully created"),
+            @ApiResponse(code = 404, message = "The requested user could not be found")
     })
-    public void SetDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) {
-            depositRequestService.Save(new DepositRequest(userService.GetOne(id), Long.parseLong(amount)));
+    public void setDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) throws NotFoundException {
+        depositRequestService.save(new DepositRequest(userService.getByID(id).orElseThrow(() -> new NotFoundException("Er kan geen geldige gebruiker gevonden worden")), Long.parseLong(amount)));
     }
 
 
     @GetMapping(path = "/deposit")
     @ApiOperation(value = "Get deposit requests", notes = "Get's all deposit requests")
     @ApiResponses({
-            @ApiResponse(code= 200,message = "depositrequests were successfully retrieved")
+            @ApiResponse(code = 200, message = "depositrequests were successfully retrieved", response = DepositRequest.class, responseContainer = "List")
     })
-    public List<DepositRequest> GetDepositRequest() {
-        return depositRequestService.GetAll();
+    public List<DepositRequest> getDepositRequests() {
+        return depositRequestService.getAll();
     }
 
 
-    //@Todo check if these methods could be merged into one & add annotations for swagger
-    /**
-     * Approve a depositrequest from user
-     *
-     * @param id the id of the Depositrequest to approve
-     * @return boolean if transaction was succesfull
-     */
-    @RequestMapping(path = "/depositapprove/{id}", method = RequestMethod.GET)
-    public boolean ApproveDepositRequest(@PathVariable("id") Integer id) {
-        try {
-            DepositRequest request = depositRequestService.GetOne(id);
+    @RequestMapping(path = "/deposithandling/{id}/{approve}", method = RequestMethod.GET)
+    public void handleDepositRequest(@PathVariable("id") Integer id, @PathVariable("approve") Boolean approve) throws NotFoundException {
 
-            User user = userService.GetOne(request.getUser().getId());
-            user.setSaldo(user.getSaldo() + request.getAmount());
-            userService.Save(user);
-
-            request.ValidateRequest();
-            depositRequestService.Save(request);
-            return true;
-        } catch (Exception x) {
-            return false;
+        if (!depositRequestService.getByID(id).isPresent()) {
+            throw new NotFoundException("De inleg aanvraag kan niet worden gevonden");
         }
+
+        if (!userService.getByID(depositRequestService.getByID(id).get().getUser().getId()).isPresent()) {
+            throw new NotFoundException("De gebruiker die aan dit request gekoppeld is kan niet worden gevonden");
+        }
+
+        DepositRequest depositRequest = depositRequestService.getByID(id).get();
+
+        if (approve) {
+
+            User user = userService.getByID(depositRequest.getUser().getId()).get();
+            user.setSaldo(user.getSaldo() + depositRequest.getAmount());
+            userService.save(user);
+
+            depositRequest.ValidateRequest();
+        } else {
+            depositRequest.setHandledDate(new Date());
+        }
+        depositRequestService.save(depositRequest);
     }
 
-    //@Todo check if these methods could be merged into one & add annotations for swagger
-    /**
-     * Reject a depositrequest from user
-     *
-     * @param id the id of the Depositrequest to reject
-     * @return boolean if transaction was succesfull
-     */
-    @RequestMapping(path = "/depositreject/{id}", method = RequestMethod.GET)
-    public boolean RejectDepositRequest(@PathVariable("id") Integer id) {
-        try {
-            DepositRequest request = depositRequestService.GetOne(id);
-            request.setHandledDate(new Date());
-            depositRequestService.Save(request);
-            return true;
-        } catch (Exception x) {
-            return false;
-        }
-    }
     //endregion
 
 

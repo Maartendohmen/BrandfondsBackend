@@ -10,7 +10,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 public class BrandfondsApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BrandfondsApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BrandfondsApplication.class, args);
+    }
 }

@@ -2,19 +2,21 @@ package nl.brandfonds.Brandfonds.abstraction;
 
 import nl.brandfonds.Brandfonds.model.Stock;
 
+import java.util.Optional;
+
 public interface IStockService {
 
-    public abstract Stock GetStock();
+    Optional<Stock> getStock();
 
-    public abstract int UpdateCurrentBottles(Integer amount);
+    int updateCurrentBottles(Integer amount);
 
-    public abstract int UpdateReturnedBottles(Integer amount);
+    int updateReturnedBottles(Integer amount);
 
-    public abstract int AddOneToStock();
+    int addOneToStock();
 
-    public abstract int RemoveOneFromStock();
+    int removeOneFromStock();
 
-    public abstract int AddMultipleToStock(Integer amount);
+    int addMultipleToStock(Integer amount);
 
-    public abstract int RemoveMultipleFromStock(Integer amount);
+    int removeMultipleFromStock(Integer amount);
 }

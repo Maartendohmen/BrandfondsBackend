@@ -3,6 +3,7 @@ package nl.brandfonds.Brandfonds.resource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
@@ -33,7 +34,7 @@ public class DayController {
     //region Get Stripes methods
 
     @GetMapping
-    @ApiOperation(value = "All stripes", notes = "Get all stripes for all users")
+    @ApiOperation(value = "All stripes", notes = "Get all stripes for all users", nickname = "getAllStripes", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
@@ -42,7 +43,7 @@ public class DayController {
     }
 
     @GetMapping(path = "/{id}")
-    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user")
+    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user", nickname = "getAllDaysForSingleUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
@@ -51,7 +52,7 @@ public class DayController {
     }
 
     @GetMapping(path = "/{id}/{date}")
-    @ApiOperation(value = "All stripes for user for day", notes = "Get all stripes for one user on one day")
+    @ApiOperation(value = "All stripes for user for day", notes = "Get all stripes for one user on one day", nickname = "getStripesForOneDayForOneUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class)
     })
@@ -66,11 +67,11 @@ public class DayController {
     }
 
     @GetMapping(path = "/{id}/totalstripes")
-    @ApiOperation(value = "Total stripes number", notes = "Get the total number of stripes for one person")
+    @ApiOperation(value = "Total stripes number", notes = "Get the total number of stripes for one person", nickname = "getTotalStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Total stripes successfully retrieved", response = Integer.class)
     })
-    public int getTotalStripes(@PathVariable("id") Integer id) {
+    public int getTotalStripesForUser(@PathVariable("id") Integer id) {
 
         if (!dayService.getTotalStripesFromUser(id).isPresent()) {
             return 0;
@@ -80,7 +81,7 @@ public class DayController {
     }
 
     @GetMapping(path = "/{id}/sortedbymonth")
-    @ApiOperation(value = "Stripes month", notes = "Get the total number of stripes combined with the month")
+    @ApiOperation(value = "Stripes month", notes = "Get the total number of stripes combined with the month", nickname = "getTotalStripesForUserPerMonth", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Total stripes/months successfully retrieved")
     })
@@ -118,7 +119,7 @@ public class DayController {
     //region Edit Stripes methods
 
     @GetMapping(path = "/addstripe/{id}/{date}")
-    @ApiOperation(value = "Add stripe user", notes = "Add a stripe for a specific user")
+    @ApiOperation(value = "Add stripe user", notes = "Add a stripe for a specific user", nickname = "addStripeForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripe successfully added"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
@@ -143,7 +144,7 @@ public class DayController {
     }
 
     @PutMapping(path = "/addstripes/{id}/{date}")
-    @ApiOperation(value = "Add multiple stripes user", notes = "Add multiple stripes for one user")
+    @ApiOperation(value = "Add multiple stripes user", notes = "Add multiple stripes for one user", nickname = "addMultipeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully added"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
@@ -169,7 +170,7 @@ public class DayController {
     }
 
     @GetMapping(path = "/removestripe/{id}/{date}")
-    @ApiOperation(value = "remove stripe user", notes = "remove a stripe for a specific user")
+    @ApiOperation(value = "remove stripe user", notes = "remove a stripe for a specific user", nickname = "removeStripeForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripe successfully removed"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
@@ -198,7 +199,7 @@ public class DayController {
     }
 
     @PutMapping(path = "/removestripes/{id}/{date}")
-    @ApiOperation(value = "Remove multiple stripes user", notes = "Remove multiple stripes for one user")
+    @ApiOperation(value = "Remove multiple stripes user", notes = "Remove multiple stripes for one user", nickname = "removeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully added"),
             @ApiResponse(code = 404, message = "The requested user could not be found")

@@ -2,6 +2,8 @@ package nl.brandfonds.Brandfonds.implementation;
 
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -18,40 +20,25 @@ import java.util.Properties;
 @Service
 public class MailImpl implements IMailService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MailImpl.class);
 
-    private String EMAILADRESS;
-    private String PASSWORD;
-    private String FORGOTPASSWORDBASEURL;
-    private String REGISTRATIONURL;
-    private String ACTIVATEUSERURL;
+    @Value("${automaticmail.mailadres}")
+    private String mailAdres;
+
+    @Value("${automaticmail.password}")
+    private String mailPassword;
+
+    @Value("${resetpassword.url}")
+    private String forgotPasswordBaseUrl;
+
+    @Value("${registration.url}")
+    private String registrationBaseUrl;
+
+    @Value("${activateuser.url}")
+    private String activateUserUrl;
 
     private Properties mailproperties;
     private Session mailSession;
-
-    @Value("${automaticmail.mailadres}")
-    public void setMailadres(String mailadres) {
-        EMAILADRESS = mailadres;
-    }
-
-    @Value("${automaticmail.password}")
-    public void setPassword(String password) {
-        PASSWORD = password;
-    }
-
-    @Value("${resetpassword.ownurl}")
-    public void setFORGOTPASSWORDBASEURL(String FORGOTPASSWORDBASEURL) {
-        this.FORGOTPASSWORDBASEURL = FORGOTPASSWORDBASEURL;
-    }
-
-    @Value("${registration.ownurl}")
-    public void setREGISTRATIONURL(String REGISTRATIONURL) {
-        this.REGISTRATIONURL = REGISTRATIONURL;
-    }
-
-    @Value("${activateuser.ownurl}")
-    public void setACTIVATEUSERURL(String ACTIVATEUSERURL) {
-        this.ACTIVATEUSERURL = ACTIVATEUSERURL;
-    }
 
     //BE AWARE AVG MUST BE OFF BEFORE TESTING
 
@@ -61,7 +48,7 @@ public class MailImpl implements IMailService {
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
-                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.setFrom(new InternetAddress(mailAdres));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
                 message.setSubject("Registratie brandfonds");
 
@@ -75,13 +62,13 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("registratielink", REGISTRATIONURL + registrationCode);
+                String newhtmlpage = data.replace("registratielink", registrationBaseUrl + registrationCode);
 
                 message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
-                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+                logger.info("A registration conformation mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -98,7 +85,7 @@ public class MailImpl implements IMailService {
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
-                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.setFrom(new InternetAddress(mailAdres));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
                 message.setSubject("Wachtwoord reset brandfonds");
 
@@ -112,13 +99,13 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("resetpasswordlink", FORGOTPASSWORDBASEURL + forgotPasswordCode);
+                String newhtmlpage = data.replace("resetpasswordlink", forgotPasswordBaseUrl + forgotPasswordCode);
 
                 message.setContent(newhtmlpage, "text/html");
 
                 Transport.send(message);
 
-                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+                logger.info("A password reset mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -134,7 +121,7 @@ public class MailImpl implements IMailService {
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
-                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.setFrom(new InternetAddress(mailAdres));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
                 message.setSubject("Gebruiker activeren brandfonds");
 
@@ -148,7 +135,7 @@ public class MailImpl implements IMailService {
                     // do whatever
                 }
 
-                String newhtmlpage = data.replace("ACTIVATEUSERURL", ACTIVATEUSERURL + id);
+                String newhtmlpage = data.replace("ACTIVATEUSERURL", activateUserUrl + id);
                 newhtmlpage = newhtmlpage.replace("USERNAME", username);
                 newhtmlpage = newhtmlpage.replace("MAILADRES", email);
 
@@ -156,7 +143,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+                logger.info("A activition request mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -172,7 +159,7 @@ public class MailImpl implements IMailService {
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
-                message.setFrom(new InternetAddress(EMAILADRESS));
+                message.setFrom(new InternetAddress(mailAdres));
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
                 message.setSubject("Gebruiker geactiveerd brandfonds");
 
@@ -193,7 +180,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                System.out.println("nl.pts44.pts44backend.MailImpl sent to: " + receipent);
+                logger.info("A activition conformation mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -229,7 +216,7 @@ public class MailImpl implements IMailService {
         mailSession = Session.getInstance(mailproperties,
                 new Authenticator() {
                     protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(EMAILADRESS, PASSWORD);
+                        return new PasswordAuthentication(mailAdres, mailPassword);
                     }
                 });
     }

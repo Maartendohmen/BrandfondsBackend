@@ -1,5 +1,7 @@
 package nl.brandfonds.Brandfonds.utils;
 
+import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
+import nl.brandfonds.Brandfonds.abstraction.IRegisterRequestService;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
 import nl.brandfonds.Brandfonds.repository.RegisterRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,30 +14,30 @@ import java.util.Date;
 public class SchedulesUtil {
 
     @Autowired
-    PasswordChangeRequestRepository passwordChangeRequestRepository;
+    IPasswordChangeRequestService passwordChangeRequestService;
 
     @Autowired
-    RegisterRequestRepository registerRequestRepository;
+    IRegisterRequestService registerRequestService;
 
     //Check every 30 seconds if link is invalid
 
     @Scheduled(cron = "0 0/5 * * * ?")
     public void deletePasswordRequests() {
 
-        passwordChangeRequestRepository.findAll().forEach(passwordChangeRequest -> {
+        passwordChangeRequestService.getAll().forEach(passwordChangeRequest -> {
             if (new Date().getTime() - passwordChangeRequest.getInitialdate().getTime() >= 20 * 60 * 1000
             ) {
-                passwordChangeRequestRepository.delete(passwordChangeRequest);
+                passwordChangeRequestService.delete(passwordChangeRequest);
             }
         });
     }
 
     @Scheduled(cron = "0 0/5 * * * ?")
     public void deleteRegisterRequests() {
-        registerRequestRepository.findAll().forEach(registerRequest -> {
+        registerRequestService.getAll().forEach(registerRequest -> {
             if (new Date().getTime() - registerRequest.getInitialdate().getTime() >= 20 * 60 * 1000
             ) {
-                registerRequestRepository.delete(registerRequest);
+                registerRequestService.delete(registerRequest);
             }
         });
     }

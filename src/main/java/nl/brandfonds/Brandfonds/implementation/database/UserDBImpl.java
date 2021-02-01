@@ -4,6 +4,9 @@ import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.UserRole;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
+import nl.brandfonds.Brandfonds.resource.AuthenticationController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class UserDBImpl implements IUserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDBImpl.class);
 
     @Autowired
     UserRepository userRepository;
@@ -33,11 +38,13 @@ public class UserDBImpl implements IUserService {
     @Override
     public void save(User user) {
         userRepository.save(user);
+        logger.info("A new user with forname {} and surname {} was created",user.getForname(),user.getSurname());
     }
 
     @Override
     public void delete(User user) {
         userRepository.delete(user);
+        logger.info("A new user with forname {} and surname {} was deleted",user.getForname(),user.getSurname());
     }
 
     @Override

@@ -5,7 +5,6 @@ import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.files.FileType;
 import nl.brandfonds.Brandfonds.model.Receipt;
-import nl.brandfonds.Brandfonds.model.responses.ReceiptFile;
 import nl.brandfonds.Brandfonds.repository.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +33,7 @@ public class ReceiptDBImpl implements IReceiptService {
     ReceiptRepository receiptRepository;
 
     @Override
-    public void saveFile(MultipartFile file, String description, Long paidAmount) throws IOException, AlreadyExistException {
+    public void saveFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException, AlreadyExistException {
 
         String filename = file.getOriginalFilename();
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
@@ -52,7 +51,7 @@ public class ReceiptDBImpl implements IReceiptService {
         File tempToDeleteFile = new File("compressed_image." + fileType);
         tempToDeleteFile.delete();
 
-        Receipt dbFile = new Receipt(filename, FileType.valueOf(fileType.toUpperCase()), description, new Date(),paidAmount);
+        Receipt dbFile = new Receipt(filename, FileType.valueOf(fileType.toUpperCase()), description, paidDate,paidAmount);
         receiptRepository.save(dbFile);
     }
 
@@ -78,7 +77,7 @@ public class ReceiptDBImpl implements IReceiptService {
     }
 
     @Override
-    public ReceiptFile getReceiptFileByName(String name) throws NotFoundException, IOException {
+    public String getEncodedReceiptFileByName(String name) throws NotFoundException, IOException {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
         if (!dbReceipt.isPresent()){
@@ -90,7 +89,22 @@ public class ReceiptDBImpl implements IReceiptService {
         Path path = Paths.get(filePath);
         byte[] data = Files.readAllBytes(path);
 
-        return new ReceiptFile(dbReceipt.get(), Base64.getEncoder().encodeToString(data));
+        return Base64.getEncoder().encodeToString(data);
+    }
+
+    @Override
+    public byte[] getRawReceiptFileByName(String name) throws NotFoundException, IOException {
+        Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
+
+        if (!dbReceipt.isPresent()){
+            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
+        }
+
+        String filePath = fileSaveLocation + "receipts" + System.getProperty("file.separator") + dbReceipt.get().getFilename();
+
+        Path path = Paths.get(filePath);
+
+        return Files.readAllBytes(path);
     }
 
     private BufferedImage resizeAndCompressImage(MultipartFile file) throws IOException {

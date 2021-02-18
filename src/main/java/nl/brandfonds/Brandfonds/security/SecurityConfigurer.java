@@ -43,11 +43,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
             cors.setAllowedOrigins(Arrays.asList("*"));
             cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+            cors.setExposedHeaders(Arrays.asList("Content-Disposition"));
             return cors;
         })
                 .and()
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**", "/rest/fileupload/**").authenticated()
+                .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**", "/rest/file/**").authenticated()
 /*                .authorizeRequests().antMatchers("/rest/auth/**").permitAll()
 //                .and()
 //                .authorizeRequests().antMatchers("/rest/user/{id}/saldo").hasRole("BRANDMASTER")

@@ -3,6 +3,8 @@ package nl.brandfonds.Brandfonds.implementation.database;
 import nl.brandfonds.Brandfonds.abstraction.IPasswordChangeRequestService;
 import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.repository.PasswordChangeRequestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,8 @@ import java.util.Optional;
 
 @Service
 public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PasswordChangeRequestDBImpl.class);
 
     @Autowired
     PasswordChangeRequestRepository passwordChangeRequestRepository;
@@ -28,11 +32,15 @@ public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestServic
     @Override
     public void save(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.save(passwordChangeRequest);
+        logger.info("A password change request for mailadres {} was created",
+               passwordChangeRequest.getEmailadres());
     }
 
     @Override
     public void delete(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.delete(passwordChangeRequest);
+        logger.info("A password change request for deleted {} was created",
+                passwordChangeRequest.getEmailadres());
     }
 
     @Override

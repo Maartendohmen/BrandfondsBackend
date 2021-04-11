@@ -54,8 +54,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 //                .authorizeRequests().antMatchers("/rest/user/{id}/saldo").hasRole("BRANDMASTER")
                 .anyRequest().authenticated()*/
                 .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override

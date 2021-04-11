@@ -13,6 +13,7 @@ public class Stock {
 
     private Integer currentBottles;
     private Integer returnedBottles;
+    private Integer nonStripedBottles;
 
     public Stock() {
     }
@@ -39,5 +40,13 @@ public class Stock {
 
     public void setReturnedBottles(Integer returnedBottles) {
         this.returnedBottles = returnedBottles;
+    }
+
+    public Integer getNonStripedBottles() {
+        return nonStripedBottles;
+    }
+
+    public void setNonStripedBottles(Integer nonStripedBottles) {
+        this.nonStripedBottles = nonStripedBottles;
     }
 }

@@ -45,5 +45,12 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
     @Query("UPDATE Stock SET currentBottles= currentBottles - ?1 where id = 1")
     int removeMultipleFromStock(Integer amount);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Stock SET nonStripedBottles= ?1 where id = 1")
+    int updateNonStripedBottles(Integer amount);
+
+
+
 
 }

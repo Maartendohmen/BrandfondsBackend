@@ -48,4 +48,13 @@ public class StockController {
     public int updateReturnedBottles(@PathVariable("amount") Integer amount) {
         return stockService.updateReturnedBottles(amount);
     }
+
+    @PutMapping(path = "/editnonstripedbottles/{amount}")
+    @ApiOperation(value = "Update non striped bottles", notes = "Updates the amount of bottles that are not striped", nickname = "updateNotStripedBottles", authorizations = @Authorization(value = "jwtToken"))
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "returned bottles was successfully updated", response = Integer.class)
+    })
+    public int updateNotStripedBottles(@PathVariable("amount") Integer amount) {
+        return stockService.updateNonStripedBottles(amount);
+    }
 }

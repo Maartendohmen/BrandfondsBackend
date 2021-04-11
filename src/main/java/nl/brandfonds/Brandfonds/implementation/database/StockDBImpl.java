@@ -18,7 +18,6 @@ public class StockDBImpl implements IStockService {
     @Autowired
     StockRepository stockRepository;
 
-
     @Override
     public Optional<Stock> getStock() {
         return stockRepository.getStock();
@@ -36,6 +35,11 @@ public class StockDBImpl implements IStockService {
         int result = stockRepository.updateReturnedBottles(amount);
         logger.info("Updated bottles in stock was updated to {}", amount);
         return result;
+    }
+
+    @Override
+    public int updateNonStripedBottles(Integer amount) {
+        return stockRepository.updateNonStripedBottles(amount);
     }
 
     @Override

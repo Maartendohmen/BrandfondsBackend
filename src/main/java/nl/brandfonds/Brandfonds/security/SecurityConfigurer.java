@@ -48,7 +48,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         })
                 .and()
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**", "/rest/file/**").authenticated()
+                .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**", "/rest/receipt/**").authenticated()
 /*                .authorizeRequests().antMatchers("/rest/auth/**").permitAll()
 //                .and()
 //                .authorizeRequests().antMatchers("/rest/user/{id}/saldo").hasRole("BRANDMASTER")

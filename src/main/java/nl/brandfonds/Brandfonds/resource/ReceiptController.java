@@ -21,13 +21,13 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(value = "/rest/file")
+@RequestMapping(value = "/rest/receipt")
 public class ReceiptController {
 
     @Autowired
     IReceiptService receiptService;
 
-    @PostMapping(path = "/receipt")
+    @PostMapping
     @ApiOperation(value = "Upload a receipt file", notes = "Upload a receipt file to save", nickname = "uploadReceiptFile")
     public void uploadReceipt(@RequestParam("file") MultipartFile file,
                                    @RequestParam("description") String description,
@@ -41,13 +41,13 @@ public class ReceiptController {
         receiptService.saveFile(file, description, paidDate, paidAmount);
     }
 
-    @GetMapping(path = "/receipt")
+    @GetMapping
     @ApiOperation(value = "Retrieve all receipts", notes = "Retrieve all receipts info", nickname = "getAllReceipts")
     public List<Receipt> retrieveAllReceipt() {
         return receiptService.getAll();
     }
 
-    @GetMapping(path = "/receipt/{filename}/encoded")
+    @GetMapping(path = "/file/encoded/{filename}")
     @ApiOperation(value = "Retrieve encoded receipt image", notes = "Retrieve the encoded receipt image as string", nickname = "getEncodedReceiptFileByName")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Receipt file was succesfully loaded")
@@ -56,7 +56,7 @@ public class ReceiptController {
         return receiptService.getEncodedReceiptFileByName(filename);
     }
 
-    @GetMapping(path = "/receipt/{filename}/raw", produces = "image/jpeg")
+    @GetMapping(path = "/file/raw/{filename}", produces = "image/jpeg")
     @ApiOperation(value = "Retrieve raw receipt image", notes = "Retrieve the raw receipt image as bytes", nickname = "getRawReceiptFileByName")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Receipt file was succesfully loaded")

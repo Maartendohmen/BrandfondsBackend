@@ -2,23 +2,23 @@ package nl.brandfonds.Brandfonds.security;
 
 public class AuthenticationRequest {
 
-    private String username;
+    private String mailadres;
     private String password;
 
     public AuthenticationRequest() {
     }
 
-    public AuthenticationRequest(String username, String password) {
-        this.username = username;
+    public AuthenticationRequest(String mailadres, String password) {
+        this.mailadres = mailadres;
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
+    public String getMailadres() {
+        return mailadres;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setMailadres(String mailadres) {
+        this.mailadres = mailadres;
     }
 
     public String getPassword() {

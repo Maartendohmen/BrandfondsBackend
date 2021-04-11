@@ -39,7 +39,7 @@ public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestServic
     @Override
     public void delete(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.delete(passwordChangeRequest);
-        logger.info("A password change request for deleted {} was created",
+        logger.info("A password change request for {} was deleted",
                 passwordChangeRequest.getEmailadres());
     }
 

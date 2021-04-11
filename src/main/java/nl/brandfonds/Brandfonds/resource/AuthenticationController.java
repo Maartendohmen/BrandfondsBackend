@@ -66,19 +66,19 @@ public class AuthenticationController {
     public AuthenticationResponse login(@RequestBody AuthenticationRequest authenticationRequest) throws UserDisabledException, NotFoundException {
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getMailadres(),
                     authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            throw new NotFoundException("De ingevoerde voornaam of het wachtwoord is fout");
+            throw new NotFoundException("Het ingevoerde mailadres of wachtwoord is fout");
         } catch (DisabledException d){
             throw new UserDisabledException("Het account waarmee je probeert in te loggen is uitgeschakeld, wacht of neem contact op met de brandmeester totdat je account is geactiveerd");
         }
 
-        final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(authenticationRequest.getMailadres());
 
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return new AuthenticationResponse(jwt, userService.getByName(authenticationRequest.getUsername()).get());
+        return new AuthenticationResponse(jwt, userService.getByMail(authenticationRequest.getMailadres()).get());
 
     }
 

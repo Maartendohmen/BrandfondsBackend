@@ -25,8 +25,8 @@ public class CustomUserDetailsServer implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        if (userService.getByName(s).isPresent()) {
-            User retrievedUser = userService.getByName(s).get();
+        if (userService.getByMail(s).isPresent()) {
+            User retrievedUser = userService.getByMail(s).get();
 
             //Build user Authority. some how a convert from your custom roles which are in database to spring GrantedAuthority
             List<GrantedAuthority> authorities = buildUserAuthority(retrievedUser.getUserRole());
@@ -42,14 +42,14 @@ public class CustomUserDetailsServer implements UserDetailsService {
     //Fill your extended User object (CurrentUser) here and return it
     private CustomUserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
 
-        String username = user.getForname();
+        String mailadres = user.getEmailadres();
         String password = user.getPassword();
         boolean enabled = user.isActivated();
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
 
-        CustomUserDetails customuser = new CustomUserDetails(username, password, enabled, accountNonExpired, credentialsNonExpired,
+        CustomUserDetails customuser = new CustomUserDetails(mailadres, password, enabled, accountNonExpired, credentialsNonExpired,
                 accountNonLocked, authorities);
 
         customuser.setId(user.getId());

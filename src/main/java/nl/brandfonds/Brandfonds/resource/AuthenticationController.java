@@ -148,7 +148,7 @@ public class AuthenticationController {
                     PasswordChangeRequest request = new PasswordChangeRequest(mailadres);
                     passwordChangeRequestService.save(request);
 
-                    mailService.sendChangePasswordMail(request.getEmailadres(), request.getRandomstring());
+                    mailService.sendChangePasswordMail(request.getEmailadres(), request.getRandomString());
                 }
         );
     }
@@ -188,13 +188,13 @@ public class AuthenticationController {
     //endregion
 
 
-    @GetMapping(path = "/activate-user/{id}/{is-activated}")
+    @GetMapping(path = "/activate-user/{id}")
     @ApiOperation(value = "Set user activation", notes = "Set user active/inactive", nickname = "setUserActivation")
     @ApiResponses({
             @ApiResponse(code = 200, message = "User status successfully updated", response = ResponseEntity.class),
             @ApiResponse(code = 404, message = "User could not be found", response = ResponseEntity.class)
     })
-    public void setUserActivation(@PathVariable("id") Integer id, @PathVariable("is-activated") boolean isActivated) throws UserDisabledException {
+    public void setUserActivation(@PathVariable("id") Integer id, @RequestParam("is-activated") boolean isActivated) throws UserDisabledException {
 
         if (!userService.getByID(id).isPresent()) {
             throw new UserDisabledException("De gebruiker die je wilt activeren staat niet meer in het systeem");

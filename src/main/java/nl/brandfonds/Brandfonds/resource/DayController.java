@@ -43,27 +43,20 @@ public class DayController {
     }
 
     @GetMapping(path = "/{id}")
-    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user", nickname = "getAllDaysForSingleUser", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user in total or single day", nickname = "getStripesForOneUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
-    public List<Day> getAllFromUser(@PathVariable(value = "id") Integer id) {
-        return dayService.getByUserID(id);
-    }
+    public List<Day> getFromSingleUser(@PathVariable(value = "id") Integer id,
+                                             @RequestParam(value = "date", required = false) Date date) {
 
-    @GetMapping(path = "/{id}/{date}")
-    @ApiOperation(value = "All stripes for user for day", notes = "Get all stripes for one user on one day", nickname = "getStripesForOneDayForOneUser", authorizations = @Authorization(value = "jwtToken"))
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class)
-    })
-    public Day getFromSingleUserByDate(@PathVariable(value = "id") Integer id,
-                                       @PathVariable("date") Date date) {
+        if (date != null) {
+            var stripesForDates = dayService.getByUserIDAndDate(date, id);
 
-        if (!dayService.getByUserIDAndDate(date,id).isPresent())
-        {
-            return null;
+            return Collections.singletonList(stripesForDates.orElse(null));
         }
-        return dayService.getByUserIDAndDate(date, id).get();
+
+        return dayService.getByUserID(id);
     }
 
     @GetMapping(path = "/{id}/totalstripes")

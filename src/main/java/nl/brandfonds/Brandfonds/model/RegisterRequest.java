@@ -1,5 +1,8 @@
 package nl.brandfonds.Brandfonds.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.persistence.Entity;
@@ -8,6 +11,9 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class RegisterRequest {
 
     @Id
@@ -21,59 +27,12 @@ public class RegisterRequest {
     private String surname;
     private String password;
 
-    public RegisterRequest() {
-    }
-
     public RegisterRequest(String emailadres, String forname, String surname, String password) {
         this.randomString = RandomStringUtils.randomAlphanumeric(15);
         this.initialdate = new Date();
         this.emailadres = emailadres;
         this.forname = forname;
         this.surname = surname;
-        this.password = password;
-    }
-
-    public String getRandomString() {
-        return randomString;
-    }
-
-    public void setRandomString(String randomString) {
-        this.randomString = randomString;
-    }
-
-    public Date getInitialdate() {
-        return initialdate;
-    }
-
-    public String getEmailadres() {
-        return emailadres;
-    }
-
-    public void setEmailadres(String emailadres) {
-        this.emailadres = emailadres;
-    }
-
-    public String getForname() {
-        return forname;
-    }
-
-    public void setForname(String forname) {
-        this.forname = forname;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 }

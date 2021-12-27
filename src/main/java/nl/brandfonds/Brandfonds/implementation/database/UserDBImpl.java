@@ -1,22 +1,35 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.UserRole;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
-import nl.brandfonds.Brandfonds.resource.AuthenticationController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import static nl.brandfonds.Brandfonds.utils.ImageManipulation.resizeAndCompressImage;
+
 @Service
+@Slf4j
 public class UserDBImpl implements IUserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserDBImpl.class);
+    @Value("${file.savelocation}")
+    private String fileSaveLocation;
 
     @Autowired
     UserRepository userRepository;
@@ -38,13 +51,13 @@ public class UserDBImpl implements IUserService {
     @Override
     public void save(User user) {
         userRepository.save(user);
-        logger.info("A new user with forname {} and surname {} was created",user.getForname(),user.getSurname());
+        log.info("A new user with forname {} and surname {} was created", user.getForname(), user.getSurname());
     }
 
     @Override
     public void delete(User user) {
         userRepository.delete(user);
-        logger.info("A new user with forname {} and surname {} was deleted",user.getForname(),user.getSurname());
+        log.info("A new user with forname {} and surname {} was deleted", user.getForname(), user.getSurname());
     }
 
     @Override
@@ -68,7 +81,47 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
+    public void saveProfilePicture(User user, MultipartFile file) throws IOException {
+        String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
+        String filename = String.format("%s.%s", user.getId(),fileType);
+        String filePath = getProfilePictureFilePath(filename);
+
+        BufferedImage bufferedImageResource = resizeAndCompressImage(file,500,500);
+        java.io.File outputFile = new java.io.File(filePath);
+        ImageIO.write(bufferedImageResource, fileType, outputFile);
+
+        // cleanup temp file
+        File tempToDeleteFile = new File("compressed_image." + fileType);
+        tempToDeleteFile.delete();
+
+        user.setProfilePictureFileName(filename);
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public String getEncodedProfilePicture(User user) throws NotFoundException, IOException {
+
+        if (user.getProfilePictureFileName() == null || user.getProfilePictureFileName().isEmpty()) {
+            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
+        }
+
+        Path path = Paths.get(getProfilePictureFilePath(user.getProfilePictureFileName()));
+        byte[] data = Files.readAllBytes(path);
+
+        return Base64.getEncoder().encodeToString(data);
+    }
+
+    @Override
     public void updatePassword(String newpassword, String emailadres) {
         userRepository.updatePassword(newpassword, emailadres);
     }
+
+    private String getProfilePictureFilePath(String filename) {
+        var fileSeparator = System.getProperty("file.separator");
+        var folderName = "profile_pictures";
+
+        return String.format("%s%s%s%s", fileSaveLocation, folderName, fileSeparator, filename);
+    }
+
+
 }

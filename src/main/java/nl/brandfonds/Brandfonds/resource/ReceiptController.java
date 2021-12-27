@@ -38,7 +38,7 @@ public class ReceiptController {
             paidDate = new Date();
         }
 
-        receiptService.saveFile(file, description, paidDate, paidAmount);
+        receiptService.saveReceiptFile(file, description, paidDate, paidAmount);
     }
 
     @GetMapping

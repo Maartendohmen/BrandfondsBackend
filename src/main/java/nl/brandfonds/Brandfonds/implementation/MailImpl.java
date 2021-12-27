@@ -1,9 +1,8 @@
 package nl.brandfonds.Brandfonds.implementation;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.brandfonds.Brandfonds.BrandfondsApplication;
 import nl.brandfonds.Brandfonds.abstraction.IMailService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Service
+@Slf4j
 public class MailImpl implements IMailService {
-
-    private static final Logger logger = LoggerFactory.getLogger(MailImpl.class);
 
     @Value("${automaticmail.mailadres}")
     private String mailAdres;
@@ -68,7 +66,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                logger.info("A registration conformation mail was send to {}", receipent);
+                log.info("A registration conformation mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -105,7 +103,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                logger.info("A password reset mail was send to {}", receipent);
+                log.info("A password reset mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -143,7 +141,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                logger.info("A activition request mail was send to {}", receipent);
+                log.info("A activition request mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 
@@ -180,7 +178,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                logger.info("A activition conformation mail was send to {}", receipent);
+                log.info("A activition conformation mail was send to {}", receipent);
 
             } catch (MessagingException e) {
 

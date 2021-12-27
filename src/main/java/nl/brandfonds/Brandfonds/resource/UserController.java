@@ -12,7 +12,9 @@ import nl.brandfonds.Brandfonds.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +48,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/{id}/saldo")
-    @ApiOperation(value = "Get saldo user", notes = "Gets the saldo from a user",nickname = "getSaldoFromUser", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Get saldo user", notes = "Gets the saldo from a user", nickname = "getSaldoFromUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Saldo was successfully retrieved", response = Long.class),
             @ApiResponse(code = 404, message = "The requested user could not be found", response = NotFoundException.class),
@@ -77,12 +79,42 @@ public class UserController {
         userService.setUserSaldo(amount, id);
     }
 
+    @PostMapping(path = "/profile_picture/{id}")
+    @ApiOperation(value = "Update user profile picture", notes = "Updates the current profile picture of a user", nickname = "setUserProfilePicture", authorizations = @Authorization(value = "jwtToken"))
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Profile picture was successfully updated"),
+            @ApiResponse(code = 404, message = "The requested user could not be found"),
+    })
+    public void setUserProfilePicture(@PathVariable("id") Integer id, @RequestParam("file") MultipartFile file) throws IOException, NotFoundException {
+        var user = userService.getByID(id);
+
+        if (!user.isPresent()) {
+            throw new NotFoundException("De gebruiker kan niet worden gevonden");
+        }
+        userService.saveProfilePicture(user.get(), file);
+    }
+
+    @GetMapping(path = "/profile_picture/{id}")
+    @ApiOperation(value = "Get user profile picture", notes = "Get the current profile picture of a user", nickname = "getUserProfilePicture", authorizations = @Authorization(value = "jwtToken"))
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Profile picture was successfully retrieved"),
+            @ApiResponse(code = 404, message = "The requested user could not be found"),
+    })
+    public String getEncodedUserProfilePicture(@PathVariable("id") Integer id) throws IOException, NotFoundException {
+        var user = userService.getByID(id);
+
+        if (!user.isPresent()) {
+            throw new NotFoundException("De gebruiker kan niet worden gevonden");
+        }
+        return userService.getEncodedProfilePicture(user.get());
+    }
+
     //region Deposit methods
 
     @PostMapping(path = "/{id}/deposit")
     @ApiOperation(value = "Create deposit request", notes = "Creates a deposit request with given amount", nickname = "createDepositRequest", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Depositrequest was successfully created",response = ResponseEntity.class),
+            @ApiResponse(code = 200, message = "Depositrequest was successfully created", response = ResponseEntity.class),
             @ApiResponse(code = 404, message = "The requested user could not be found", response = NotFoundException.class)
     })
     public void setDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) throws NotFoundException {

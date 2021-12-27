@@ -16,8 +16,6 @@ import nl.brandfonds.Brandfonds.model.PasswordChangeRequest;
 import nl.brandfonds.Brandfonds.model.RegisterRequest;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.security.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -70,7 +68,7 @@ public class AuthenticationController {
                     authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
             throw new NotFoundException("Het ingevoerde mailadres of wachtwoord is fout");
-        } catch (DisabledException d){
+        } catch (DisabledException d) {
             throw new UserDisabledException("Het account waarmee je probeert in te loggen is uitgeschakeld, wacht of neem contact op met de brandmeester totdat je account is geactiveerd");
         }
 
@@ -140,7 +138,7 @@ public class AuthenticationController {
     })
     public void forgotPassword(@PathVariable("mailadres") String mailadres) throws NotFoundException {
 
-        if (!userService.getByMail(mailadres).isPresent()){
+        if (!userService.getByMail(mailadres).isPresent()) {
             throw new NotFoundException("Er kan geen gebruiker met dit mailadres worden gevonden");
         }
 

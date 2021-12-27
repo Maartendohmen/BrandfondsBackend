@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface IReceiptService {
 
-    void saveFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException, AlreadyExistException;
+    void saveReceiptFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException, AlreadyExistException;
 
     void delete(Receipt receipt);
 

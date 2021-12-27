@@ -37,7 +37,6 @@ public class FileWatcherUtil implements FileChangeListener {
         for (ChangedFiles cfiles : changeSet) {
             for (ChangedFile cfile : cfiles.getFiles()) {
                 if (cfile.getType().equals(ChangedFile.Type.DELETE)) {
-
                     switch (cfile.getFile().getParentFile().getName()) {
                         case "receipts":
                             try {

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.File;
 
 @Entity
 @NoArgsConstructor
@@ -22,8 +21,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     @Column(unique = true)
-    private String emailadres;
-    private String forname;
+    private String mailadres;
+    private String forename;
     private String surname;
     private String profilePictureFileName;
     @Setter(value = AccessLevel.NONE)
@@ -32,9 +31,9 @@ public class User {
     private long saldo; //in cents
     private boolean activated;
 
-    public User(String emailadres, String forname, String surname, String password) {
-        this.emailadres = emailadres;
-        this.forname = forname;
+    public User(String mailadres, String forename, String surname, String password) {
+        this.mailadres = mailadres;
+        this.forename = forename;
         this.surname = surname;
         this.password = password;
         this.saldo = 0;

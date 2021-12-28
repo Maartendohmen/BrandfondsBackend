@@ -18,14 +18,14 @@ public class Receipt {
     @Id
     @GeneratedValue
     private Integer id;
-    private String filename;
+    private String fileName;
 
     private String description;
     private Date paidDate;
     private Long paidAmount;
 
     public Receipt(String filename, String description, Date paidDate, Long paidAmount) {
-        this.filename = filename;
+        this.fileName = filename;
         this.description = description;
         this.paidDate = paidDate;
         this.paidAmount = paidAmount;

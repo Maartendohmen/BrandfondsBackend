@@ -5,7 +5,6 @@ import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.Receipt;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;

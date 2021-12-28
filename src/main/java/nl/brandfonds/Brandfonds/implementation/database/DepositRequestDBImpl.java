@@ -23,7 +23,7 @@ public class DepositRequestDBImpl implements IDepositRequestService {
     }
 
     @Override
-    public Optional<DepositRequest> getByID(Integer id) {
+    public Optional<DepositRequest> getOne(Integer id) {
         return depositRequestRepository.findById(id);
     }
 
@@ -31,15 +31,15 @@ public class DepositRequestDBImpl implements IDepositRequestService {
     public void save(DepositRequest depositRequest) {
         depositRequestRepository.save(depositRequest);
         log.info("A deposit request for user {} {} with mailadres {} was created for {} euro",
-                depositRequest.getUser().getForname(), depositRequest.getUser().getSurname(),
-                depositRequest.getUser().getEmailadres(), depositRequest.getAmount());
+                depositRequest.getUser().getForename(), depositRequest.getUser().getSurname(),
+                depositRequest.getUser().getMailadres(), depositRequest.getAmount());
     }
 
     @Override
     public void delete(DepositRequest depositRequest) {
         depositRequestRepository.delete(depositRequest);
         log.info("A deposit request for user {} {} with mailadres {} was deleted",
-                depositRequest.getUser().getForname(), depositRequest.getUser().getSurname(),
-                depositRequest.getUser().getEmailadres());
+                depositRequest.getUser().getForename(), depositRequest.getUser().getSurname(),
+                depositRequest.getUser().getMailadres());
     }
 }

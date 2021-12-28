@@ -12,5 +12,5 @@ public interface PasswordChangeRequestRepository extends JpaRepository<PasswordC
 
     //get passwordrequest based on random string
     @Query("SELECT r FROM PasswordChangeRequest r WHERE randomString = ?1")
-    Optional<PasswordChangeRequest> getByrandomString(String randomString);
+    Optional<PasswordChangeRequest> getByRandomString(String randomString);
 }

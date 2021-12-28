@@ -23,26 +23,26 @@ public class PasswordChangeRequestDBImpl implements IPasswordChangeRequestServic
     }
 
     @Override
-    public PasswordChangeRequest getOne(Integer id) {
-        return passwordChangeRequestRepository.getOne(id);
+    public Optional<PasswordChangeRequest> getOne(Integer id) {
+        return passwordChangeRequestRepository.findById(id);
     }
 
     @Override
     public void save(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.save(passwordChangeRequest);
         log.info("A password change request for mailadres {} was created",
-                passwordChangeRequest.getEmailadres());
+                passwordChangeRequest.getMailadres());
     }
 
     @Override
     public void delete(PasswordChangeRequest passwordChangeRequest) {
         passwordChangeRequestRepository.delete(passwordChangeRequest);
         log.info("A password change request for {} was deleted",
-                passwordChangeRequest.getEmailadres());
+                passwordChangeRequest.getMailadres());
     }
 
     @Override
-    public Optional<PasswordChangeRequest> getByrandomString(String randomString) {
-        return passwordChangeRequestRepository.getByrandomString(randomString);
+    public Optional<PasswordChangeRequest> getByRandomString(String randomString) {
+        return passwordChangeRequestRepository.getByRandomString(randomString);
     }
 }

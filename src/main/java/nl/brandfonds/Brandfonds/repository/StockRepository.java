@@ -51,6 +51,4 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
     int updateNonStripedBottles(Integer amount);
 
 
-
-
 }

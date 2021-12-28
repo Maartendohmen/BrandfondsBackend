@@ -1,8 +1,8 @@
 package nl.brandfonds.Brandfonds.implementation.database;
 
 import nl.brandfonds.Brandfonds.abstraction.IReceiptService;
-import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException.FileAlreadyExistException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException.FileNotFoundException;
 import nl.brandfonds.Brandfonds.model.Receipt;
 import nl.brandfonds.Brandfonds.repository.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,29 +17,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static nl.brandfonds.Brandfonds.utils.ImageManipulation.resizeAndCompressImage;
 
 @Service
 public class ReceiptDBImpl implements IReceiptService {
 
+    @Autowired
+    ReceiptRepository receiptRepository;
     @Value("${file.savelocation}")
     private String fileSaveLocation;
 
-    @Autowired
-    ReceiptRepository receiptRepository;
-
     @Override
-    public void saveReceiptFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException, AlreadyExistException {
+    public void saveReceiptFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException {
 
         String filename = file.getOriginalFilename();
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
         String filePath = getReceiptFilePath(filename);
 
-        if (receiptRepository.getByName(filename).isPresent()) {
-            throw new AlreadyExistException("Er bestaat al een bestand met dezelfde naam op de server");
-        }
+        receiptRepository.getByName(filename).orElseThrow(() -> new FileAlreadyExistException(filename));
 
         BufferedImage bufferedImageResource = resizeAndCompressImage(file);
         java.io.File outputFile = new java.io.File(filePath);
@@ -64,25 +64,20 @@ public class ReceiptDBImpl implements IReceiptService {
     }
 
     @Override
-    public Receipt getReceiptByName(String name) throws NotFoundException {
+    public Receipt getReceiptByName(String name) {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        if (!dbReceipt.isPresent()) {
-            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
-        }
+        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
 
         return dbReceipt.get();
     }
 
     @Override
-    public String getEncodedReceiptFileByName(String name) throws NotFoundException, IOException {
+    public String getEncodedReceiptFileByName(String name) throws IOException {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        if (!dbReceipt.isPresent()) {
-            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
-        }
-
-        String filePath = getReceiptFilePath(dbReceipt.get().getFilename());
+        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
+        String filePath = getReceiptFilePath(dbReceipt.get().getFileName());
 
         Path path = Paths.get(filePath);
         byte[] data = Files.readAllBytes(path);
@@ -91,14 +86,11 @@ public class ReceiptDBImpl implements IReceiptService {
     }
 
     @Override
-    public byte[] getRawReceiptFileByName(String name) throws NotFoundException, IOException {
+    public byte[] getRawReceiptFileByName(String name) throws IOException {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        if (!dbReceipt.isPresent()) {
-            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
-        }
-
-        String filePath = getReceiptFilePath(dbReceipt.get().getFilename());
+        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
+        String filePath = getReceiptFilePath(dbReceipt.get().getFileName());
 
         Path path = Paths.get(filePath);
 

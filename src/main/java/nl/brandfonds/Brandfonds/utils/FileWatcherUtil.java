@@ -2,13 +2,9 @@ package nl.brandfonds.Brandfonds.utils;
 
 import nl.brandfonds.Brandfonds.abstraction.IReceiptService;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
-import nl.brandfonds.Brandfonds.implementation.database.ReceiptDBImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.devtools.filewatch.ChangedFile;
 import org.springframework.boot.devtools.filewatch.ChangedFiles;
 import org.springframework.boot.devtools.filewatch.FileChangeListener;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

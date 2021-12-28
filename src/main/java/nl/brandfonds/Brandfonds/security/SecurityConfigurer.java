@@ -39,13 +39,13 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors().configurationSource(request -> {
-            CorsConfiguration cors = new CorsConfiguration();
-            cors.setAllowedOrigins(Arrays.asList("*"));
-            cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-            cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-            cors.setExposedHeaders(Arrays.asList("Content-Disposition"));
-            return cors;
-        })
+                    CorsConfiguration cors = new CorsConfiguration();
+                    cors.setAllowedOrigins(Arrays.asList("*"));
+                    cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    cors.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+                    cors.setExposedHeaders(Arrays.asList("Content-Disposition"));
+                    return cors;
+                })
                 .and()
                 .csrf().disable()
                 .authorizeRequests().antMatchers("/rest/day/**", "/rest/user/**", "/rest/stock/**", "/rest/receipt/**").authenticated()

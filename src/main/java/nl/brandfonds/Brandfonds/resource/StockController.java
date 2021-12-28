@@ -24,11 +24,8 @@ public class StockController {
             @ApiResponse(code = 200, message = "Stock was successfully retrieved", response = Stock.class),
             @ApiResponse(code = 404, message = "The stock values weren't found", response = ResponseEntity.class)
     })
-    public Stock getStock() throws NotFoundException {
-        if (!stockService.getStock().isPresent()) {
-            throw new NotFoundException("De voorraad informatie kan op dit moment niet opgehaald worden, probeer het later opnieuw");
-        }
-        return stockService.getStock().get();
+    public Stock getStock() {
+        return stockService.getStock().orElseThrow(NotFoundException.StockNotFoundException::new);
     }
 
     @PutMapping(path = "/editcurrentbottles/{amount}")

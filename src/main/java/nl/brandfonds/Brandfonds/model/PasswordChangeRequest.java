@@ -17,13 +17,13 @@ public class PasswordChangeRequest {
     @Id
     @GeneratedValue
     private Integer id;
-    private String emailadres;
+    private String mailadres;
     private String randomString;
-    private Date initialdate;
+    private Date initialDate;
 
-    public PasswordChangeRequest(String emailadres) {
-        this.emailadres = emailadres;
+    public PasswordChangeRequest(String mailadres) {
+        this.mailadres = mailadres;
         this.randomString = RandomStringUtils.randomAlphanumeric(10);
-        this.initialdate = new Date();
+        this.initialDate = new Date();
     }
 }

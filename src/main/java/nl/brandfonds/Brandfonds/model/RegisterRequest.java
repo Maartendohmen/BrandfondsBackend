@@ -20,18 +20,18 @@ public class RegisterRequest {
     @GeneratedValue
     private Integer id;
     private String randomString;
-    private Date initialdate;
+    private Date initialDate;
 
-    private String emailadres;
-    private String forname;
+    private String mailadres;
+    private String forename;
     private String surname;
     private String password;
 
-    public RegisterRequest(String emailadres, String forname, String surname, String password) {
+    public RegisterRequest(String mailadres, String forename, String surname, String password) {
         this.randomString = RandomStringUtils.randomAlphanumeric(15);
-        this.initialdate = new Date();
-        this.emailadres = emailadres;
-        this.forname = forname;
+        this.initialDate = new Date();
+        this.mailadres = mailadres;
+        this.forename = forename;
         this.surname = surname;
         this.password = password;
     }

@@ -6,7 +6,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import nl.brandfonds.Brandfonds.abstraction.IDepositRequestService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException.DepositRequestNotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +52,12 @@ public class UserController {
     @ApiOperation(value = "Get saldo user", notes = "Gets the saldo from a user", nickname = "getSaldoFromUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Saldo was successfully retrieved", response = Long.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = NotFoundException.class),
+            @ApiResponse(code = 404, message = "The requested user could not be found", response = UserNotFoundException.class),
 
     })
-    public long getUserSaldo(@PathVariable(value = "id") Integer id) throws NotFoundException {
+    public long getUserSaldo(@PathVariable(value = "id") Integer id) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden gevonden");
-        }
+        userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         return userService.getUserSaldo(id);
     }
@@ -70,11 +69,9 @@ public class UserController {
             @ApiResponse(code = 404, message = "The requested user could not be found"),
     })
     public void setUserSaldo(@PathVariable("id") Integer id,
-                             @RequestBody long amount) throws NotFoundException {
+                             @RequestBody long amount) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("Het veranderen van het saldo is mislukt, de gebruiker kan niet gevonden worden");
-        }
+        userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         userService.setUserSaldo(amount, id);
     }
@@ -85,13 +82,9 @@ public class UserController {
             @ApiResponse(code = 200, message = "Profile picture was successfully updated"),
             @ApiResponse(code = 404, message = "The requested user could not be found"),
     })
-    public void setUserProfilePicture(@PathVariable("id") Integer id, @RequestParam("file") MultipartFile file) throws IOException, NotFoundException {
-        var user = userService.getByID(id);
-
-        if (!user.isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden gevonden");
-        }
-        userService.saveProfilePicture(user.get(), file);
+    public void setUserProfilePicture(@PathVariable("id") Integer id, @RequestParam("file") MultipartFile file) throws IOException {
+        var user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
+        userService.saveProfilePicture(user, file);
     }
 
     @GetMapping(path = "/profile_picture/{id}")
@@ -100,13 +93,10 @@ public class UserController {
             @ApiResponse(code = 200, message = "Profile picture was successfully retrieved"),
             @ApiResponse(code = 404, message = "The requested user could not be found"),
     })
-    public String getEncodedUserProfilePicture(@PathVariable("id") Integer id) throws IOException, NotFoundException {
-        var user = userService.getByID(id);
+    public String getEncodedUserProfilePicture(@PathVariable("id") Integer id) throws IOException {
+        var user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden gevonden");
-        }
-        return userService.getEncodedProfilePicture(user.get());
+        return userService.getEncodedProfilePicture(user);
     }
 
     //region Deposit methods
@@ -115,10 +105,10 @@ public class UserController {
     @ApiOperation(value = "Create deposit request", notes = "Creates a deposit request with given amount", nickname = "createDepositRequest", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Depositrequest was successfully created", response = ResponseEntity.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = NotFoundException.class)
+            @ApiResponse(code = 404, message = "The requested user could not be found", response = UserNotFoundException.class)
     })
-    public void setDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) throws NotFoundException {
-        depositRequestService.save(new DepositRequest(userService.getByID(id).orElseThrow(() -> new NotFoundException("Er kan geen geldige gebruiker gevonden worden")), Long.parseLong(amount)));
+    public void setDepositRequest(@PathVariable("id") Integer id, @RequestBody String amount) {
+        depositRequestService.save(new DepositRequest(userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id)), Long.parseLong(amount)));
     }
 
 
@@ -134,21 +124,12 @@ public class UserController {
 
     @RequestMapping(path = "/deposithandling/{id}/{approve}", method = RequestMethod.GET)
     @ApiOperation(value = "Set deposit status", notes = "Sets the status of the deposit to approved/unapproved", nickname = "setDepositStatus", authorizations = @Authorization(value = "jwtToken"))
-    public void handleDepositRequest(@PathVariable("id") Integer id, @PathVariable("approve") Boolean approve) throws NotFoundException {
+    public void handleDepositRequest(@PathVariable("id") Integer id, @PathVariable("approve") Boolean approve) {
 
-        if (!depositRequestService.getByID(id).isPresent()) {
-            throw new NotFoundException("De inleg aanvraag kan niet worden gevonden");
-        }
-
-        if (!userService.getByID(depositRequestService.getByID(id).get().getUser().getId()).isPresent()) {
-            throw new NotFoundException("De gebruiker die aan dit request gekoppeld is kan niet worden gevonden");
-        }
-
-        DepositRequest depositRequest = depositRequestService.getByID(id).get();
+        var depositRequest = depositRequestService.getOne(id).orElseThrow(() -> new DepositRequestNotFoundException(id));
 
         if (approve) {
-
-            User user = userService.getByID(depositRequest.getUser().getId()).get();
+            var user = userService.getOne(depositRequest.getUser().getId()).orElseThrow(() -> new UserNotFoundException("ID", id.toString()));
             user.setSaldo(user.getSaldo() + depositRequest.getAmount());
             userService.save(user);
 

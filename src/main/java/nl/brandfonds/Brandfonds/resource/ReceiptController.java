@@ -30,9 +30,9 @@ public class ReceiptController {
     @PostMapping
     @ApiOperation(value = "Upload a receipt file", notes = "Upload a receipt file to save", nickname = "uploadReceiptFile")
     public void uploadReceipt(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("description") String description,
-                                   @RequestParam(value = "date", required = false) Date paidDate,
-                                   @RequestParam(name = "paidAmount", required = false) Long paidAmount) throws IOException, AlreadyExistException {
+                              @RequestParam("description") String description,
+                              @RequestParam(value = "date", required = false) Date paidDate,
+                              @RequestParam(name = "paidAmount", required = false) Long paidAmount) throws IOException, AlreadyExistException {
 
         if (paidDate == null) {
             paidDate = new Date();

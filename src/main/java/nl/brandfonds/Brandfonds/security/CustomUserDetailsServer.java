@@ -42,7 +42,7 @@ public class CustomUserDetailsServer implements UserDetailsService {
     //Fill your extended User object (CurrentUser) here and return it
     private CustomUserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
 
-        String mailadres = user.getEmailadres();
+        String mailadres = user.getMailadres();
         String password = user.getPassword();
         boolean enabled = user.isActivated();
         boolean accountNonExpired = true;

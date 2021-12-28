@@ -23,26 +23,26 @@ public class RegisterRequestDBImpl implements IRegisterRequestService {
     }
 
     @Override
-    public RegisterRequest getOne(Integer id) {
-        return registerRequestRepository.getOne(id);
+    public Optional<RegisterRequest> getOne(Integer id) {
+        return registerRequestRepository.findById(id);
     }
 
     @Override
     public void save(RegisterRequest registerRequest) {
         registerRequestRepository.save(registerRequest);
         log.info("A register request for user {} {} with mailadres {} was created",
-                registerRequest.getForname(), registerRequest.getSurname(), registerRequest.getEmailadres());
+                registerRequest.getForename(), registerRequest.getSurname(), registerRequest.getMailadres());
     }
 
     @Override
     public void delete(RegisterRequest registerRequest) {
         registerRequestRepository.delete(registerRequest);
         log.info("A register request for user {} {} with mailadres {} was deleted",
-                registerRequest.getForname(), registerRequest.getSurname(), registerRequest.getEmailadres());
+                registerRequest.getForename(), registerRequest.getSurname(), registerRequest.getMailadres());
     }
 
     @Override
-    public Optional<RegisterRequest> getByrandomString(String randomString) {
-        return registerRequestRepository.getByrandomString(randomString);
+    public Optional<RegisterRequest> getByRandomString(String randomString) {
+        return registerRequestRepository.getByRandomString(randomString);
     }
 }

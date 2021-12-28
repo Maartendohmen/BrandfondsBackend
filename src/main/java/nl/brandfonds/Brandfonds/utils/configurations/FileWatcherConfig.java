@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.devtools.filewatch.FileSystemWatcher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
@@ -17,11 +16,11 @@ import java.time.Duration;
 @Configuration
 public class FileWatcherConfig implements CommandLineRunner {
 
-    @Value("${file.savelocation}")
-    private String fileSaveLocation;
-
     @Autowired
     IReceiptService receiptService;
+
+    @Value("${file.savelocation}")
+    private String fileSaveLocation;
 
     @Bean
     public FileSystemWatcher fileSystemWatcher() {

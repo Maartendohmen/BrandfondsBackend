@@ -12,5 +12,5 @@ public interface RegisterRequestRepository extends JpaRepository<RegisterRequest
 
     //get registerrequest based on random string
     @Query("SELECT r FROM RegisterRequest r WHERE randomString = ?1")
-    Optional<RegisterRequest> getByrandomString(String randomString);
+    Optional<RegisterRequest> getByRandomString(String randomString);
 }

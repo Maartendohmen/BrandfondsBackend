@@ -6,15 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface IDayService {
-
-    List<Day> getAll();
-
-    Optional<Day> getOne(Integer id);
-
-    void save(Day day);
-
-    void delete(Day day);
+public interface IDayService extends IBaseService<Day> {
 
     List<Day> getByUserID(Integer id);
 

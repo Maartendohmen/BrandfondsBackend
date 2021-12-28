@@ -2,7 +2,7 @@ package nl.brandfonds.Brandfonds.implementation.database;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException.FileNotFoundException;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.UserRole;
 import nl.brandfonds.Brandfonds.repository.UserRepository;
@@ -28,11 +28,11 @@ import static nl.brandfonds.Brandfonds.utils.ImageManipulation.resizeAndCompress
 @Slf4j
 public class UserDBImpl implements IUserService {
 
-    @Value("${file.savelocation}")
-    private String fileSaveLocation;
-
+    private static final String FOLDER_NAME = "profile_pictures";
     @Autowired
     UserRepository userRepository;
+    @Value("${file.savelocation}")
+    private String fileSaveLocation;
 
     @Override
     public List<User> getAll() {
@@ -44,20 +44,20 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
-    public Optional<User> getByID(Integer id) {
+    public Optional<User> getOne(Integer id) {
         return userRepository.findById(id);
     }
 
     @Override
     public void save(User user) {
         userRepository.save(user);
-        log.info("A new user with forname {} and surname {} was created", user.getForname(), user.getSurname());
+        log.info("A new user with forname {} and surname {} was created", user.getForename(), user.getSurname());
     }
 
     @Override
     public void delete(User user) {
         userRepository.delete(user);
-        log.info("A new user with forname {} and surname {} was deleted", user.getForname(), user.getSurname());
+        log.info("A new user with forname {} and surname {} was deleted", user.getForename(), user.getSurname());
     }
 
     @Override
@@ -83,10 +83,10 @@ public class UserDBImpl implements IUserService {
     @Override
     public void saveProfilePicture(User user, MultipartFile file) throws IOException {
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
-        String filename = String.format("%s.%s", user.getId(),fileType);
+        String filename = String.format("%s.%s", user.getId(), fileType);
         String filePath = getProfilePictureFilePath(filename);
 
-        BufferedImage bufferedImageResource = resizeAndCompressImage(file,500,500);
+        BufferedImage bufferedImageResource = resizeAndCompressImage(file, 500, 500);
         java.io.File outputFile = new java.io.File(filePath);
         ImageIO.write(bufferedImageResource, fileType, outputFile);
 
@@ -99,10 +99,10 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
-    public String getEncodedProfilePicture(User user) throws NotFoundException, IOException {
+    public String getEncodedProfilePicture(User user) throws IOException {
 
         if (user.getProfilePictureFileName() == null || user.getProfilePictureFileName().isEmpty()) {
-            throw new NotFoundException("De opgevraagde afbeelding kan niet gevonden worden");
+            throw new FileNotFoundException(user.getProfilePictureFileName(), fileSaveLocation + FOLDER_NAME);
         }
 
         Path path = Paths.get(getProfilePictureFilePath(user.getProfilePictureFileName()));
@@ -118,9 +118,8 @@ public class UserDBImpl implements IUserService {
 
     private String getProfilePictureFilePath(String filename) {
         var fileSeparator = System.getProperty("file.separator");
-        var folderName = "profile_pictures";
 
-        return String.format("%s%s%s%s", fileSaveLocation, folderName, fileSeparator, filename);
+        return String.format("%s%s%s%s", fileSaveLocation, FOLDER_NAME, fileSeparator, filename);
     }
 
 

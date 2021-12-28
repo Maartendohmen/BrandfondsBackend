@@ -7,7 +7,7 @@ import io.swagger.annotations.Authorization;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.responses.StripesMonth;
@@ -48,7 +48,7 @@ public class DayController {
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
     public List<Day> getFromSingleUser(@PathVariable(value = "id") Integer id,
-                                             @RequestParam(value = "date", required = false) Date date) {
+                                       @RequestParam(value = "date", required = false) Date date) {
 
         if (date != null) {
             var stripesForDates = dayService.getByUserIDAndDate(date, id);
@@ -118,13 +118,10 @@ public class DayController {
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
     public int addStripeForUser(@PathVariable(value = "id") Integer id,
-                                @PathVariable("date") Date date) throws NotFoundException {
+                                @PathVariable("date") Date date) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("De gebruiker  kan niet worden opgehaald");
-        }
 
-        User user = userService.getByID(id).get();
+        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
             dayService.save(new Day(user, date, 0));
@@ -144,13 +141,9 @@ public class DayController {
     })
     public int addStripesForUser(@PathVariable("id") Integer id,
                                  @PathVariable("date") Date date,
-                                 @RequestBody Integer amount) throws NotFoundException {
+                                 @RequestBody Integer amount) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden opgehaald");
-        }
-
-        User user = userService.getByID(id).get();
+        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
             dayService.save(new Day(user, date, 0));
@@ -169,13 +162,9 @@ public class DayController {
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
     public void removeStripeForUser(@PathVariable("id") Integer id,
-                                    @PathVariable("date") Date date) throws NotFoundException {
+                                    @PathVariable("date") Date date) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden opgehaald");
-        }
-
-        User user = userService.getByID(id).get();
+        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         dayService.getByUserIDAndDate(date, id).ifPresent(specifiday -> {
             if (specifiday.getStripes() >= 2) {
@@ -199,13 +188,9 @@ public class DayController {
     })
     public void removeStripesForUser(@PathVariable("id") Integer id,
                                      @PathVariable("date") Date date,
-                                     @RequestBody Integer amount) throws NotFoundException {
+                                     @RequestBody Integer amount) {
 
-        if (!userService.getByID(id).isPresent()) {
-            throw new NotFoundException("De gebruiker kan niet worden opgehaald");
-        }
-
-        User user = userService.getByID(id).get();
+        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         dayService.getByUserIDAndDate(date, id).ifPresent(specifiday -> {
             if (specifiday.getStripes() > amount) {
@@ -219,11 +204,6 @@ public class DayController {
                 dayService.delete(specifiday);
             }
         });
-
-
     }
-
     //endregion
-
-
 }

@@ -12,16 +12,16 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    @Query("SELECT u FROM User u WHERE forname = ?1 AND password = ?2")
+    @Query("SELECT u FROM User u WHERE forename = ?1 AND password = ?2")
     Optional<User> login(String username, String password);
 
     @Query("SELECT u FROM User u WHERE id = ?1")
     Optional<User> getByID(Integer id);
 
-    @Query("SELECT u FROM User u WHERE emailadres = ?1")
+    @Query("SELECT u FROM User u WHERE mailadres = ?1")
     Optional<User> getByMail(String mail);
 
-    @Query("SELECT u FROM User u WHERE forname = ?1")
+    @Query("SELECT u FROM User u WHERE forename = ?1")
     Optional<User> getByName(String name);
 
     @Query("SELECT saldo FROM User WHERE id = ?1")
@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE User SET password= ?1 WHERE emailadres= ?2")
+    @Query("UPDATE User SET password= ?1 WHERE mailadres= ?2")
     void updatePassword(String newPassword, String mailadres);
 
 }

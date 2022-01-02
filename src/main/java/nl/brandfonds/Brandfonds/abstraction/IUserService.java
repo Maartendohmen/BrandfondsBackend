@@ -21,5 +21,5 @@ public interface IUserService extends IBaseService<User> {
 
     String getEncodedProfilePicture(User user) throws NotFoundException, IOException;
 
-    void updatePassword(String newpassword, String emailadres);
+    void updatePassword(String newPassword, String mailadres);
 }

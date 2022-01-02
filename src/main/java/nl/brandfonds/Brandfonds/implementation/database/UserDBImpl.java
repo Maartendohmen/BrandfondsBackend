@@ -51,13 +51,13 @@ public class UserDBImpl implements IUserService {
     @Override
     public void save(User user) {
         userRepository.save(user);
-        log.info("A new user with forname {} and surname {} was created", user.getForename(), user.getSurname());
+        log.info("A new user with forename {} and surname {} was created", user.getForename(), user.getSurname());
     }
 
     @Override
     public void delete(User user) {
         userRepository.delete(user);
-        log.info("A new user with forname {} and surname {} was deleted", user.getForename(), user.getSurname());
+        log.info("A new user with forename {} and surname {} was deleted", user.getForename(), user.getSurname());
     }
 
     @Override
@@ -112,8 +112,8 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
-    public void updatePassword(String newpassword, String emailadres) {
-        userRepository.updatePassword(newpassword, emailadres);
+    public void updatePassword(String newPassword, String mailadres) {
+        userRepository.updatePassword(newPassword, mailadres);
     }
 
     private String getProfilePictureFilePath(String filename) {

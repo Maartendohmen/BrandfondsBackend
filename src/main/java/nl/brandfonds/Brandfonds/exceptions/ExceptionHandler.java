@@ -12,7 +12,7 @@ import java.util.Date;
 @ControllerAdvice
 public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @org.springframework.web.bind.annotation.ExceptionHandler({Exception.class})
+    @org.springframework.web.bind.annotation.ExceptionHandler({BaseException.class})
     public ResponseEntity<Object> handleAnyException(BaseException ex, WebRequest request) {
 
         ErrorMessage errorMessage = new ErrorMessage(new Date(), ex.getMessage(), ex.getClass().getSimpleName());

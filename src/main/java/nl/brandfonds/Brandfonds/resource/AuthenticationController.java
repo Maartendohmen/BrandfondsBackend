@@ -56,7 +56,7 @@ public class AuthenticationController {
     AuthenticationManager authenticationManager;
 
     @PostMapping
-    @ApiOperation(value = "Login", notes = "Logs in user using forname and password", nickname = "login")
+    @ApiOperation(value = "Login", notes = "Logs in user using forename and password", nickname = "login")
     @ApiResponses({
             @ApiResponse(code = 200, message = "User was successfully logged in", response = AuthenticationResponse.class),
             @ApiResponse(code = 403, message = "The user is set to inactive", response = ResponseEntity.class),
@@ -132,7 +132,7 @@ public class AuthenticationController {
     @ApiOperation(value = "Forgot password", notes = "Checks if user exist and sends password change mail to corresponding mail address", nickname = "resetPasswordRequest")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Mail was successfully send to corresponding address", response = ResponseEntity.class),
-            @ApiResponse(code = 404, message = "The provided emailadress is not found", response = ResponseEntity.class)
+            @ApiResponse(code = 404, message = "The provided mailadres is not found", response = ResponseEntity.class)
     })
     public void forgotPassword(@PathVariable("mailadres") String mailadres) throws NotFoundException {
         userService.getByMail(mailadres).ifPresentOrElse(user -> {

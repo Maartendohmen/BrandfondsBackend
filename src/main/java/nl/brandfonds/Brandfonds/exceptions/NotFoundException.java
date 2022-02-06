@@ -22,7 +22,6 @@ public class NotFoundException extends BaseException {
         public UserNotFoundException(String mailadres, String password) {
             super("User with mailadres '%s' and password '%s' could not be found", mailadres, password);
         }
-
     }
 
     public static class FileNotFoundException extends NotFoundException {

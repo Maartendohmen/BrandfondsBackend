@@ -12,7 +12,7 @@ public class DisabledException extends BaseException {
 
     public static class UserDisabledException extends DisabledException {
         public UserDisabledException(String identifier, String value) {
-            super("User with %s '%s' is currently disabled");
+            super("User with %s '%s' is currently disabled", identifier, value);
         }
     }
 }

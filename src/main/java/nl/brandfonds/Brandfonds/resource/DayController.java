@@ -111,37 +111,15 @@ public class DayController {
 
     //region Edit Stripes methods
 
-    @GetMapping(path = "/addstripe/{id}/{date}")
-    @ApiOperation(value = "Add stripe user", notes = "Add a stripe for a specific user", nickname = "addStripeForUser", authorizations = @Authorization(value = "jwtToken"))
+    @GetMapping(path = "/addstripes/{id}/{date}")
+    @ApiOperation(value = "Add stripe(s) user", notes = "Add stripe(s) for a specific user", nickname = "addStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripe successfully added"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
-    public int addStripeForUser(@PathVariable(value = "id") Integer id,
-                                @PathVariable("date") Date date) {
-
-
-        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
-            dayService.save(new Day(user, date, 0));
-        }
-
-        user.setSaldo(user.getSaldo() - 50);
-        stockService.removeOneFromStock();
-
-        return dayService.addStripe(date, id);
-    }
-
-    @PutMapping(path = "/addstripes/{id}/{date}")
-    @ApiOperation(value = "Add multiple stripes user", notes = "Add multiple stripes for one user", nickname = "addMultipeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripes successfully added"),
-            @ApiResponse(code = 404, message = "The requested user could not be found")
-    })
-    public int addStripesForUser(@PathVariable("id") Integer id,
-                                 @PathVariable("date") Date date,
-                                 @RequestBody Integer amount) {
+    public int addStripeForUser(@PathVariable("id") Integer id,
+                                @PathVariable("date") Date date,
+                                @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
 
         User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
@@ -150,59 +128,32 @@ public class DayController {
         }
 
         user.setSaldo(user.getSaldo() - (amount * 50));
-        stockService.removeMultipleFromStock(amount);
+        stockService.removeFromStock(amount);
 
-        return dayService.addMultipleStripes(amount, date, id);
+        return dayService.addStripes(amount,date, id);
     }
 
-    @GetMapping(path = "/removestripe/{id}/{date}")
-    @ApiOperation(value = "remove stripe user", notes = "remove a stripe for a specific user", nickname = "removeStripeForUser", authorizations = @Authorization(value = "jwtToken"))
+    @GetMapping(path = "/removestripes/{id}/{date}")
+    @ApiOperation(value = "remove stripe(s) user", notes = "remove stripe(s) for a specific user", nickname = "removeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripe successfully removed"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
     public void removeStripeForUser(@PathVariable("id") Integer id,
-                                    @PathVariable("date") Date date) {
+                                    @PathVariable("date") Date date,
+                                    @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
 
         User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        dayService.getByUserIDAndDate(date, id).ifPresent(specifiday -> {
-            if (specifiday.getStripes() >= 2) {
-                user.setSaldo(user.getSaldo() + 50);
-                stockService.addOneToStock();
-                dayService.removeStripe(date, id);
+        dayService.getByUserIDAndDate(date, id).ifPresent(specific -> {
+            if (specific.getStripes() >= 2) {
+                dayService.removeStripes(amount,date,id);
+
             } else {
-                user.setSaldo(user.getSaldo() + 50);
-                stockService.addOneToStock();
-                dayService.removeStripe(date, id);
-                dayService.delete(specifiday);
+                dayService.delete(specific);
             }
-        });
-    }
-
-    @PutMapping(path = "/removestripes/{id}/{date}")
-    @ApiOperation(value = "Remove multiple stripes user", notes = "Remove multiple stripes for one user", nickname = "removeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripes successfully added"),
-            @ApiResponse(code = 404, message = "The requested user could not be found")
-    })
-    public void removeStripesForUser(@PathVariable("id") Integer id,
-                                     @PathVariable("date") Date date,
-                                     @RequestBody Integer amount) {
-
-        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        dayService.getByUserIDAndDate(date, id).ifPresent(specifiday -> {
-            if (specifiday.getStripes() > amount) {
-                user.setSaldo(user.getSaldo() + (amount * 50));
-                stockService.addMultipleToStock(amount);
-                dayService.removeMultipleStripes(amount, date, id);
-            } else {
-                user.setSaldo(user.getSaldo() + (amount * 50));
-                stockService.addMultipleToStock(amount);
-                dayService.removeMultipleStripes(amount, date, id);
-                dayService.delete(specifiday);
-            }
+            user.setSaldo(user.getSaldo() + (amount * 50));
+            stockService.addToStock(amount);
         });
     }
     //endregion

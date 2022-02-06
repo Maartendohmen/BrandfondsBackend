@@ -69,7 +69,7 @@ public class UserController {
             @ApiResponse(code = 404, message = "The requested user could not be found"),
     })
     public void setUserSaldo(@PathVariable("id") Integer id,
-                             @RequestBody long amount) {
+                             @RequestBody Long amount) {
 
         userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 

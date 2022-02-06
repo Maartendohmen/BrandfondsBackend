@@ -14,11 +14,7 @@ public interface IStockService {
 
     int updateNonStripedBottles(Integer amount);
 
-    int addOneToStock();
+    int addToStock(Integer amount);
 
-    int removeOneFromStock();
-
-    int addMultipleToStock(Integer amount);
-
-    int removeMultipleFromStock(Integer amount);
+    int removeFromStock(Integer amount);
 }

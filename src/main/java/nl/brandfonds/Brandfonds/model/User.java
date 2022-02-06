@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-@Setter()
+@Setter
 public class User {
 
     @Id

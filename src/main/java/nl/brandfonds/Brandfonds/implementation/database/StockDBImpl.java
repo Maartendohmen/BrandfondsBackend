@@ -41,22 +41,12 @@ public class StockDBImpl implements IStockService {
     }
 
     @Override
-    public int addOneToStock() {
-        return stockRepository.addOneToStock();
-    }
-
-    @Override
-    public int removeOneFromStock() {
-        return stockRepository.removeOneFromStock();
-    }
-
-    @Override
-    public int addMultipleToStock(Integer amount) {
+    public int addToStock(Integer amount) {
         return stockRepository.addMultipleToStock(amount);
     }
 
     @Override
-    public int removeMultipleFromStock(Integer amount) {
+    public int removeFromStock(Integer amount) {
         return stockRepository.removeMultipleFromStock(amount);
     }
 }

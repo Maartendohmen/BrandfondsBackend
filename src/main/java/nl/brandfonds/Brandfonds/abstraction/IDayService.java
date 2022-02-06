@@ -14,11 +14,7 @@ public interface IDayService extends IBaseService<Day> {
 
     Optional<Integer> getTotalStripesFromUser(Integer id);
 
-    int addStripe(Date date, Integer id);
+    int addStripes(Integer amountOfStripes, Date date, Integer id);
 
-    int removeStripe(Date date, Integer id);
-
-    int addMultipleStripes(Integer amountOfStripes, Date date, Integer id);
-
-    int removeMultipleStripes(Integer amountOfStripes, Date date, Integer id);
+    int removeStripes(Integer amountOfStripes, Date date, Integer id);
 }

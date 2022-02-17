@@ -21,6 +21,7 @@ public class ImageManipulation {
         Thumbnails.of(originalImage)
                 .outputFormat(shortType)
                 .outputQuality(1)
+                .size(originalImage.getWidth(),originalImage.getHeight())
                 .toOutputStream(outputStream);
         byte[] data = outputStream.toByteArray();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);

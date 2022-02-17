@@ -39,7 +39,9 @@ public class ReceiptDBImpl implements IReceiptService {
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
         String filePath = getReceiptFilePath(filename);
 
-        receiptRepository.getByName(filename).orElseThrow(() -> new FileAlreadyExistException(filename));
+        receiptRepository.getByName(filename).ifPresent((foundName) -> {
+            throw new FileAlreadyExistException(foundName.getFileName());
+        });
 
         BufferedImage bufferedImageResource = resizeAndCompressImage(file);
         java.io.File outputFile = new java.io.File(filePath);

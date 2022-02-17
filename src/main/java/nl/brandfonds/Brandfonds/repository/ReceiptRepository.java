@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, Integer> {
 
-    @Query("SELECT i FROM Receipt i WHERE filename = ?1")
+    @Query("SELECT i FROM Receipt i WHERE file_name = ?1")
     Optional<Receipt> getByName(String name);
 }

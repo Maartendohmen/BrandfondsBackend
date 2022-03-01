@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import lombok.extern.slf4j.Slf4j;
 import nl.brandfonds.Brandfonds.abstraction.IDayService;
 import nl.brandfonds.Brandfonds.abstraction.IStockService;
 import nl.brandfonds.Brandfonds.abstraction.IUserService;
@@ -12,6 +13,7 @@ import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.model.responses.StripesMonth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,6 +21,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @RestController
+@Slf4j
 @RequestMapping(value = "/rest/day")
 public class DayController {
 
@@ -48,7 +51,7 @@ public class DayController {
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
     public List<Day> getFromSingleUser(@PathVariable(value = "id") Integer id,
-                                       @RequestParam(value = "date", required = false) Date date) {
+                                       @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
 
         if (date != null) {
             var stripesForDates = dayService.getByUserIDAndDate(date, id);
@@ -111,50 +114,41 @@ public class DayController {
 
     //region Edit Stripes methods
 
-    @GetMapping(path = "/addstripes/{id}/{date}")
-    @ApiOperation(value = "Add stripe(s) user", notes = "Add stripe(s) for a specific user", nickname = "addStripesForUser", authorizations = @Authorization(value = "jwtToken"))
+    @GetMapping(path = "/editstripes/{id}/{date}")
+    @ApiOperation(value = "Edit stripe(s) user", notes = "Edit stripe(s) for a specific user", nickname = "editStripesForUser", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripe successfully added"),
+            @ApiResponse(code = 200, message = "Stripe successfully edited"),
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
-    public int addStripeForUser(@PathVariable("id") Integer id,
-                                @PathVariable("date") Date date,
-                                @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
+    public int editStripeForUser(@PathVariable("id") Integer id,
+                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date,
+                                 @RequestParam(value = "amount") Integer amount) {
 
         User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
-            dayService.save(new Day(user, date, 0));
-        }
+        if (amount < 0) {
 
-        user.setSaldo(user.getSaldo() - (amount * 50));
-        stockService.removeFromStock(amount);
+            dayService.getByUserIDAndDate(date, id).ifPresent(specific -> {
 
-        return dayService.addStripes(amount,date, id);
-    }
-
-    @GetMapping(path = "/removestripes/{id}/{date}")
-    @ApiOperation(value = "remove stripe(s) user", notes = "remove stripe(s) for a specific user", nickname = "removeStripesForUser", authorizations = @Authorization(value = "jwtToken"))
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripe successfully removed"),
-            @ApiResponse(code = 404, message = "The requested user could not be found")
-    })
-    public void removeStripeForUser(@PathVariable("id") Integer id,
-                                    @PathVariable("date") Date date,
-                                    @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
-
-        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        dayService.getByUserIDAndDate(date, id).ifPresent(specific -> {
-            if (specific.getStripes() >= 2) {
-                dayService.removeStripes(amount,date,id);
-
-            } else {
-                dayService.delete(specific);
+                if (specific.getStripes() > 1) {
+                    dayService.editStripes(amount, date, id);
+                } else {
+                    dayService.delete(specific);
+                }
+                user.setSaldo(user.getSaldo() + (amount * 50));
+                stockService.addToStock(amount);
+            });
+        } else {
+            if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
+                dayService.save(new Day(user, date, 0));
             }
-            user.setSaldo(user.getSaldo() + (amount * 50));
-            stockService.addToStock(amount);
-        });
+
+            user.setSaldo(user.getSaldo() - (amount * 50));
+            stockService.removeFromStock(amount);
+
+            return dayService.editStripes(amount, date, id);
+        }
+        return 0;
     }
     //endregion
 }

@@ -6,7 +6,7 @@ import nl.brandfonds.Brandfonds.repository.DayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,12 +43,12 @@ public class DayDBImpl implements IDayService {
     }
 
     @Override
-    public Optional<Day> getByUserIDAndDate(Date date, Integer id) {
+    public Optional<Day> getByUserIDAndDate(LocalDate date, Integer id) {
         return dayRepository.getByUserIDAndDate(date, id);
     }
 
     @Override
-    public int editStripes(Integer amountOfStripes, Date date, Integer id) {
+    public int editStripes(Integer amountOfStripes, LocalDate date, Integer id) {
         return dayRepository.updateStripes(amountOfStripes, date, id);
     }
 

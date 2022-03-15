@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -19,11 +19,11 @@ public class PasswordChangeRequest {
     private Integer id;
     private String mailadres;
     private String randomString;
-    private Date initialDate;
+    private LocalDateTime initialDate;
 
     public PasswordChangeRequest(String mailadres) {
         this.mailadres = mailadres;
         this.randomString = RandomStringUtils.randomAlphanumeric(10);
-        this.initialDate = new Date();
+        this.initialDate = LocalDateTime.now();
     }
 }

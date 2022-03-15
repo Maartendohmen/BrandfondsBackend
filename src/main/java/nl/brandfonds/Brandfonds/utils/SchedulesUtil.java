@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -23,7 +24,7 @@ public class SchedulesUtil {
     public void deletePasswordRequests() {
 
         passwordChangeRequestService.getAll().forEach(passwordChangeRequest -> {
-            if (new Date().getTime() - passwordChangeRequest.getInitialDate().getTime() >= 20 * 60 * 1000
+            if (LocalDateTime.now().isAfter(passwordChangeRequest.getInitialDate().plusMinutes(20))
             ) {
                 passwordChangeRequestService.delete(passwordChangeRequest);
             }
@@ -33,7 +34,7 @@ public class SchedulesUtil {
     @Scheduled(cron = "0 0/5 * * * ?")
     public void deleteRegisterRequests() {
         registerRequestService.getAll().forEach(registerRequest -> {
-            if (new Date().getTime() - registerRequest.getInitialDate().getTime() >= 20 * 60 * 1000
+            if (LocalDateTime.now().isAfter(registerRequest.getInitialDate().plusMinutes(20))
             ) {
                 registerRequestService.delete(registerRequest);
             }

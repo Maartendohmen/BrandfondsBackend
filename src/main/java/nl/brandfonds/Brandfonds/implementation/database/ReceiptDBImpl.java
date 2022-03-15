@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +35,7 @@ public class ReceiptDBImpl implements IReceiptService {
     private String fileSaveLocation;
 
     @Override
-    public void saveReceiptFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException {
+    public void saveReceiptFile(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException {
 
         String filename = file.getOriginalFilename();
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);

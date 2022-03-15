@@ -6,13 +6,13 @@ import nl.brandfonds.Brandfonds.model.Receipt;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 
 public interface IReceiptService {
 
-    void saveReceiptFile(MultipartFile file, String description, Date paidDate, Long paidAmount) throws IOException, AlreadyExistException;
+    void saveReceiptFile(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException, AlreadyExistException;
 
     void delete(Receipt receipt);
 

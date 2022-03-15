@@ -11,14 +11,15 @@ import nl.brandfonds.Brandfonds.abstraction.IUserService;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException.UserNotFoundException;
 import nl.brandfonds.Brandfonds.model.Day;
 import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.model.responses.StripesMonth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @RestController
 @Slf4j
@@ -51,7 +52,7 @@ public class DayController {
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
     public List<Day> getFromSingleUser(@PathVariable(value = "id") Integer id,
-                                       @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
+                                       @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
         if (date != null) {
             var stripesForDates = dayService.getByUserIDAndDate(date, id);
@@ -81,33 +82,22 @@ public class DayController {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Total stripes/months successfully retrieved")
     })
-    public List<StripesMonth> getTotalStripesPerMonth(@PathVariable("id") Integer id) {
+    public Map<LocalDate, Integer> getTotalStripesPerMonth(@PathVariable("id") Integer id) {
 
-        Map<String, Integer> sortedstripes = new HashMap<>();
-        List<Day> alldays = dayService.getByUserID(id);
+        TreeMap<LocalDate, Integer> sortedStripes = new TreeMap<>();
+        List<Day> allDays = dayService.getByUserID(id);
 
-        //todo clean up and get rid of map, use list in method instead
+        allDays.forEach(day -> {
+            var truncatedToMonth = day.getDate().withDayOfMonth(1);
 
-        for (Day d : alldays) {
-
-            LocalDate daydate = d.getDate().toInstant().atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate();
-            String key = daydate.getMonthValue() + "-" + daydate.getYear();
-
-            if (sortedstripes.containsKey(key)) {
-                int currentnumber = sortedstripes.get(key);
-                int newnumber = currentnumber + d.getStripes();
-                sortedstripes.replace(key, newnumber);
+            if (sortedStripes.containsKey(truncatedToMonth)) {
+                sortedStripes.put(truncatedToMonth, sortedStripes.get(truncatedToMonth) + day.getStripes());
             } else {
-                sortedstripes.put(key, d.getStripes());
+                sortedStripes.put(truncatedToMonth, day.getStripes());
             }
-        }
+        });
 
-        List<StripesMonth> stripesMonths = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : sortedstripes.entrySet()) {
-            stripesMonths.add(new StripesMonth(entry.getKey(), entry.getValue()));
-        }
-
-        return stripesMonths;
+        return sortedStripes.descendingMap();
     }
 
     //endregion
@@ -121,7 +111,7 @@ public class DayController {
             @ApiResponse(code = 404, message = "The requested user could not be found")
     })
     public int editStripeForUser(@PathVariable("id") Integer id,
-                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date,
+                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                  @RequestParam(value = "amount") Integer amount) {
 
         User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));

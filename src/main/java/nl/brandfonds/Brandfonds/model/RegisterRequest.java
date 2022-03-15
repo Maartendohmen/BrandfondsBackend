@@ -8,7 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class RegisterRequest {
     @GeneratedValue
     private Integer id;
     private String randomString;
-    private Date initialDate;
+    private LocalDateTime initialDate;
 
     private String mailadres;
     private String forename;
@@ -29,7 +29,7 @@ public class RegisterRequest {
 
     public RegisterRequest(String mailadres, String forename, String surname, String password) {
         this.randomString = RandomStringUtils.randomAlphanumeric(15);
-        this.initialDate = new Date();
+        this.initialDate = LocalDateTime.now();
         this.mailadres = mailadres;
         this.forename = forename;
         this.surname = surname;

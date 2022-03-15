@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -21,10 +21,10 @@ public class Receipt {
     private String fileName;
 
     private String description;
-    private Date paidDate;
-    private Long paidAmount;
+    private LocalDate paidDate;
+    private long paidAmount;
 
-    public Receipt(String filename, String description, Date paidDate, Long paidAmount) {
+    public Receipt(String filename, String description, LocalDate paidDate, long paidAmount) {
         this.fileName = filename;
         this.description = description;
         this.paidDate = paidDate;

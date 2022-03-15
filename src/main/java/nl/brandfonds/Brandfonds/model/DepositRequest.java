@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -22,20 +22,20 @@ public class DepositRequest {
     @OneToOne
     private User user;
     private long amount; //in cents;
-    private Date requestDate;
-    private Date handledDate;
+    private LocalDateTime requestDate;
+    private LocalDateTime handledDate;
     private boolean accepted;
 
     public DepositRequest(User user, long amount) {
         this.user = user;
         this.amount = amount;
-        this.requestDate = new Date();
+        this.requestDate = LocalDateTime.now();
         this.handledDate = null;
         this.accepted = false;
     }
 
     public void ValidateRequest() {
-        this.handledDate = new Date();
+        this.handledDate = LocalDateTime.now();
         this.accepted = true;
     }
 }

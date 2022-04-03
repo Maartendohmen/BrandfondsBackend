@@ -8,13 +8,13 @@ public interface IStockService {
 
     Optional<Stock> getStock();
 
-    int updateCurrentBottles(Integer amount);
+    void updateCurrentBottles(Integer amount);
 
-    int updateReturnedBottles(Integer amount);
+    void updateReturnedBottles(Integer amount);
 
-    int updateNonStripedBottles(Integer amount);
+    void updateNonStripedBottles(Integer amount);
 
-    int addToStock(Integer amount);
+    void addToStock(Integer amount);
 
-    int removeFromStock(Integer amount);
+    void removeFromStock(Integer amount);
 }

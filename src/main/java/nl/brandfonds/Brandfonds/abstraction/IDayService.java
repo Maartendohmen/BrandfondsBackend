@@ -14,5 +14,5 @@ public interface IDayService extends IBaseService<Day> {
 
     Optional<Integer> getTotalStripesFromUser(Integer id);
 
-    int editStripes(Integer amountOfStripes, LocalDate date, Integer id);
+    void editStripes(Integer amountOfStripes, LocalDate date, Integer id);
 }

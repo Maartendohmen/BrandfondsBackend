@@ -22,31 +22,30 @@ public class StockDBImpl implements IStockService {
     }
 
     @Override
-    public int updateCurrentBottles(Integer amount) {
-        int result = stockRepository.updateCurrentBottles(amount);
+    public void updateCurrentBottles(Integer amount) {
+        stockRepository.updateCurrentBottles(amount);
         log.info("Current bottles in stock was updated to {}", amount);
-        return result;
+
     }
 
     @Override
-    public int updateReturnedBottles(Integer amount) {
-        int result = stockRepository.updateReturnedBottles(amount);
+    public void updateReturnedBottles(Integer amount) {
+        stockRepository.updateReturnedBottles(amount);
         log.info("Updated bottles in stock was updated to {}", amount);
-        return result;
     }
 
     @Override
-    public int updateNonStripedBottles(Integer amount) {
-        return stockRepository.updateNonStripedBottles(amount);
+    public void updateNonStripedBottles(Integer amount) {
+        stockRepository.updateNonStripedBottles(amount);
     }
 
     @Override
-    public int addToStock(Integer amount) {
-        return stockRepository.addMultipleToStock(amount);
+    public void addToStock(Integer amount) {
+        stockRepository.addMultipleToStock(amount);
     }
 
     @Override
-    public int removeFromStock(Integer amount) {
-        return stockRepository.removeMultipleFromStock(amount);
+    public void removeFromStock(Integer amount) {
+        stockRepository.removeMultipleFromStock(amount);
     }
 }

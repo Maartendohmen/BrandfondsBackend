@@ -1,144 +1,44 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import lombok.extern.slf4j.Slf4j;
-import nl.brandfonds.Brandfonds.abstraction.IDayService;
-import nl.brandfonds.Brandfonds.abstraction.IStockService;
-import nl.brandfonds.Brandfonds.abstraction.IUserService;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException.UserNotFoundException;
+import io.swagger.annotations.*;
 import nl.brandfonds.Brandfonds.model.Day;
-import nl.brandfonds.Brandfonds.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-@RestController
-@Slf4j
-@RequestMapping(value = "/rest/day")
-public class DayController {
+@Api(tags = "Stripes", description = "Stripes operations")
+public interface DayController {
 
-    @Autowired
-    IDayService dayService;
-
-    @Autowired
-    IUserService userService;
-
-    @Autowired
-    IStockService stockService;
-
-    //region Get Stripes methods
-
-    @GetMapping
-    @ApiOperation(value = "All stripes", notes = "Get all stripes for all users", nickname = "getAllStripes", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "All stripes", nickname = "getAllStripes", notes = "Get all stripes for all users", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
-    public List<Day> getAll() {
-        return dayService.getAll();
-    }
+    List<Day> getAll();
 
-    @GetMapping(path = "/{id}")
-    @ApiOperation(value = "All stripes for user", notes = "Get all stripes for one user in total or single day", nickname = "getStripesForOneUser", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "All stripes for user", nickname = "getStripesForOneUser", notes = "Get all stripes for one user in total or single day", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stripes successfully retrieved", response = Day.class, responseContainer = "List")
     })
-    public List<Day> getFromSingleUser(@PathVariable(value = "id") Integer id,
-                                       @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    List<Day> getFromSingleUser(Integer id, LocalDate data);
 
-        if (date != null) {
-            var stripesForDates = dayService.getByUserIDAndDate(date, id);
-
-            return Collections.singletonList(stripesForDates.orElse(null));
-        }
-
-        return dayService.getByUserID(id);
-    }
-
-    @GetMapping(path = "/{id}/totalstripes")
-    @ApiOperation(value = "Total stripes number", notes = "Get the total number of stripes for one person", nickname = "getTotalStripesForUser", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Total stripes number", nickname = "getTotalStripesForUser", notes = "Get the total number of stripes for one person", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Total stripes successfully retrieved", response = Integer.class)
     })
-    public int getTotalStripesForUser(@PathVariable("id") Integer id) {
+    Integer getTotalStripesForUser(Integer id);
 
-        if (!dayService.getTotalStripesFromUser(id).isPresent()) {
-            return 0;
-        }
-
-        return dayService.getTotalStripesFromUser(id).get();
-    }
-
-    @GetMapping(path = "/{id}/sortedbymonth")
-    @ApiOperation(value = "Stripes month", notes = "Get the total number of stripes combined with the month", nickname = "getTotalStripesForUserPerMonth", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Stripes month", nickname = "getTotalStripesForUserPerMonth", notes = "Get the total number of stripes combined with the month", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Total stripes/months successfully retrieved")
     })
-    public Map<LocalDate, Integer> getTotalStripesPerMonth(@PathVariable("id") Integer id) {
+    Map<LocalDate, Integer> getTotalStripesPerMonth(Integer id);
 
-        TreeMap<LocalDate, Integer> sortedStripes = new TreeMap<>();
-        List<Day> allDays = dayService.getByUserID(id);
-
-        allDays.forEach(day -> {
-            var truncatedToMonth = day.getDate().withDayOfMonth(1);
-
-            if (sortedStripes.containsKey(truncatedToMonth)) {
-                sortedStripes.put(truncatedToMonth, sortedStripes.get(truncatedToMonth) + day.getStripes());
-            } else {
-                sortedStripes.put(truncatedToMonth, day.getStripes());
-            }
-        });
-
-        return sortedStripes.descendingMap();
-    }
-
-    //endregion
-
-    //region Edit Stripes methods
-
-    @GetMapping(path = "/editstripes/{id}/{date}")
-    @ApiOperation(value = "Edit stripe(s) user", notes = "Edit stripe(s) for a specific user", nickname = "editStripesForUser", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Edit stripe(s) user", nickname = "editStripesForUser", notes = "Edit stripe(s) for a specific user", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Stripe successfully edited"),
-            @ApiResponse(code = 404, message = "The requested user could not be found")
+            @ApiResponse(code = 200, message = "Stripe successfully edited", response = ResponseEntity.class),
+            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class)
     })
-    public int editStripeForUser(@PathVariable("id") Integer id,
-                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                 @RequestParam(value = "amount") Integer amount) {
-
-        User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        if (amount < 0) {
-
-            dayService.getByUserIDAndDate(date, id).ifPresent(specific -> {
-
-                if (specific.getStripes() > 1) {
-                    dayService.editStripes(amount, date, id);
-                } else {
-                    dayService.delete(specific);
-                }
-                user.setSaldo(user.getSaldo() + (amount * 50));
-                stockService.addToStock(amount);
-            });
-        } else {
-            if (!dayService.getByUserIDAndDate(date, id).isPresent()) {
-                dayService.save(new Day(user, date, 0));
-            }
-
-            user.setSaldo(user.getSaldo() - (amount * 50));
-            stockService.removeFromStock(amount);
-
-            return dayService.editStripes(amount, date, id);
-        }
-        return 0;
-    }
-    //endregion
+    void editStripeForUser(Integer id, LocalDate date, Integer amount);
 }

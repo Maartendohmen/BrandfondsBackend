@@ -18,37 +18,27 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= ?1 where id = 1")
-    int updateCurrentBottles(Integer amount);
+    void updateCurrentBottles(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET returnedBottles= ?1 where id = 1")
-    int updateReturnedBottles(Integer amount);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Stock SET currentBottles= currentBottles + 1 where id = 1")
-    int addOneToStock();
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Stock SET currentBottles= currentBottles - 1 where id = 1")
-    int removeOneFromStock();
+    void updateReturnedBottles(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles + ?1 where id = 1")
-    int addMultipleToStock(Integer amount);
+    void addMultipleToStock(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET currentBottles= currentBottles - ?1 where id = 1")
-    int removeMultipleFromStock(Integer amount);
+    void removeMultipleFromStock(Integer amount);
 
     @Transactional
     @Modifying
     @Query("UPDATE Stock SET nonStripedBottles= ?1 where id = 1")
-    int updateNonStripedBottles(Integer amount);
+    void updateNonStripedBottles(Integer amount);
 
 
 }

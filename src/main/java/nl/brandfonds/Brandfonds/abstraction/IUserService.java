@@ -11,10 +11,6 @@ public interface IUserService extends IBaseService<User> {
 
     Optional<User> getByMail(String mail);
 
-    Optional<User> getByName(String name);
-
-    long getUserSaldo(Integer id);
-
     void setUserSaldo(Long amount, Integer id);
 
     void saveProfilePicture(User user, MultipartFile file) throws IOException;

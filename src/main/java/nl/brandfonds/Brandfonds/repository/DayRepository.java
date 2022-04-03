@@ -31,7 +31,7 @@ public interface DayRepository extends JpaRepository<Day, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Day SET stripes = stripes + ?1 WHERE date = ?2 AND user_id = ?3")
-    int updateStripes(Integer amountOfStripes, LocalDate date, Integer id);
+    void updateStripes(Integer amountOfStripes, LocalDate date, Integer id);
 
     @Query("SELECT SUM(stripes) FROM Day WHERE user_id = ?1")
     Optional<Integer> getTotalStripesFromUser(Integer id);

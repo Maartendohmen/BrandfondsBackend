@@ -40,14 +40,14 @@ public class MailImpl implements IMailService {
 
     //BE AWARE AVG MUST BE OFF BEFORE TESTING
 
-    public void sendRegisterMail(String receipent, String registrationCode) {
+    public void sendRegisterMail(String recipient, String registrationCode) {
         readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(mailAdres));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
                 message.setSubject("Registratie brandfonds");
 
                 //Readout html page
@@ -66,7 +66,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                log.info("A registration conformation mail was send to {}", receipent);
+                log.info("A registration conformation mail was send to {}", recipient);
 
             } catch (MessagingException e) {
 
@@ -77,14 +77,14 @@ public class MailImpl implements IMailService {
 
     }
 
-    public void sendChangePasswordMail(String receipent, String forgotPasswordCode) {
+    public void sendChangePasswordMail(String recipient, String forgotPasswordCode) {
         readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(mailAdres));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
                 message.setSubject("Wachtwoord reset brandfonds");
 
                 //Readout html page
@@ -103,7 +103,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                log.info("A password reset mail was send to {}", receipent);
+                log.info("A password reset mail was send to {}", recipient);
 
             } catch (MessagingException e) {
 
@@ -113,14 +113,14 @@ public class MailImpl implements IMailService {
         t.start();
     }
 
-    public void sendUserActivationMail(String receipent, String email, String username, Integer id) {
+    public void sendUserActivationMail(String recipient, String email, String username, Integer id) {
         readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(mailAdres));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
                 message.setSubject("Gebruiker activeren brandfonds");
 
                 //Readout html page
@@ -141,7 +141,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                log.info("A activition request mail was send to {}", receipent);
+                log.info("A activition request mail was send to {}", recipient);
 
             } catch (MessagingException e) {
 
@@ -151,14 +151,14 @@ public class MailImpl implements IMailService {
         t.start();
     }
 
-    public void sendUserActivatedMail(String receipent, String email, String username) {
+    public void sendUserActivatedMail(String recipient, String email, String username) {
         readInputProperties();
 
         Thread t = new Thread(() -> {
             try {
                 MimeMessage message = new MimeMessage(mailSession);
                 message.setFrom(new InternetAddress(mailAdres));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(receipent));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
                 message.setSubject("Gebruiker geactiveerd brandfonds");
 
                 //Readout html page
@@ -178,7 +178,7 @@ public class MailImpl implements IMailService {
 
                 Transport.send(message);
 
-                log.info("A activition conformation mail was send to {}", receipent);
+                log.info("A activition conformation mail was send to {}", recipient);
 
             } catch (MessagingException e) {
 

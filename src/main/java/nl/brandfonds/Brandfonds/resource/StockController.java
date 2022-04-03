@@ -1,57 +1,34 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import nl.brandfonds.Brandfonds.abstraction.IStockService;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import io.swagger.annotations.*;
 import nl.brandfonds.Brandfonds.model.Stock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping(value = "/rest/stock")
-public class StockController {
+@Api(tags = "Stock", description = "Stock operations")
+public interface StockController {
 
-    @Autowired
-    IStockService stockService;
-
-    @GetMapping
-    @ApiOperation(value = "Get current stock", notes = "Gets the current stock", nickname = "getCurrentStock", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Get current stock", nickname = "getCurrentStock", notes = "Gets the current stock", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stock was successfully retrieved", response = Stock.class),
             @ApiResponse(code = 404, message = "The stock values weren't found", response = ResponseEntity.class)
     })
-    public Stock getStock() {
-        return stockService.getStock().orElseThrow(NotFoundException.StockNotFoundException::new);
-    }
+    Stock getStock();
 
-    @PutMapping(path = "/editcurrentbottles/{amount}")
-    @ApiOperation(value = "Update current bottles", notes = "Updates the amount of bottles currently in stock", nickname = "updateCurrentBottles", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Update current bottles", nickname = "updateCurrentBottles", notes = "Updates the amount of bottles currently in stock", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "Stock was successfully updated", response = Integer.class)
     })
-    public int updateCurrentBottles(@PathVariable("amount") Integer amount) {
-        return stockService.updateCurrentBottles(amount);
-    }
+    void updateCurrentBottles(Integer Amount);
 
-    @PutMapping(path = "/editreturnedbottles/{amount}")
-    @ApiOperation(value = "Update returned bottles", notes = "Updates the amount of bottles returned to the store", nickname = "updateReturnedBottles", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Update returned bottles", nickname = "updateReturnedBottles", notes = "Updates the amount of bottles returned to the store", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "returned bottles was successfully updated", response = Integer.class)
     })
-    public int updateReturnedBottles(@PathVariable("amount") Integer amount) {
-        return stockService.updateReturnedBottles(amount);
-    }
+    void updateReturnedBottles(Integer amount);
 
-    @PutMapping(path = "/editnonstripedbottles/{amount}")
-    @ApiOperation(value = "Update non striped bottles", notes = "Updates the amount of bottles that are not striped", nickname = "updateNotStripedBottles", authorizations = @Authorization(value = "jwtToken"))
+    @ApiOperation(value = "Update non striped bottles", nickname = "updateNonReturnedBottles", notes = "Updates the amount of bottles that are not striped", authorizations = @Authorization(value = "jwtToken"))
     @ApiResponses({
             @ApiResponse(code = 200, message = "returned bottles was successfully updated", response = Integer.class)
     })
-    public int updateNotStripedBottles(@PathVariable("amount") Integer amount) {
-        return stockService.updateNonStripedBottles(amount);
-    }
+    void updateNotStripedBottles(Integer amount);
 }

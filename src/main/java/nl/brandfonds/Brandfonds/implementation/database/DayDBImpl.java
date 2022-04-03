@@ -48,8 +48,8 @@ public class DayDBImpl implements IDayService {
     }
 
     @Override
-    public int editStripes(Integer amountOfStripes, LocalDate date, Integer id) {
-        return dayRepository.updateStripes(amountOfStripes, date, id);
+    public void editStripes(Integer amountOfStripes, LocalDate date, Integer id) {
+        dayRepository.updateStripes(amountOfStripes, date, id);
     }
 
     @Override

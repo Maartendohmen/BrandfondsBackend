@@ -66,16 +66,6 @@ public class UserDBImpl implements IUserService {
     }
 
     @Override
-    public Optional<User> getByName(String name) {
-        return userRepository.getByName(name);
-    }
-
-    @Override
-    public long getUserSaldo(Integer id) {
-        return userRepository.getUserSaldo(id);
-    }
-
-    @Override
     public void setUserSaldo(Long amount, Integer id) {
         userRepository.setUserSaldo(amount, id);
     }

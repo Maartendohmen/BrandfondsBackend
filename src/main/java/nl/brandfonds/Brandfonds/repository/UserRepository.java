@@ -21,12 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE mailadres = ?1")
     Optional<User> getByMail(String mail);
 
-    @Query("SELECT u FROM User u WHERE forename = ?1")
-    Optional<User> getByName(String name);
-
-    @Query("SELECT saldo FROM User WHERE id = ?1")
-    long getUserSaldo(Integer id);
-
     @Transactional
     @Modifying
     @Query("UPDATE User SET saldo= ?1 WHERE id= ?2")

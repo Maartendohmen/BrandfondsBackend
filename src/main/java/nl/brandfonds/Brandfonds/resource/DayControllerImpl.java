@@ -85,7 +85,6 @@ public class DayControllerImpl implements DayController {
         User user = userService.getOne(id).orElseThrow(() -> new UserNotFoundException(id));
 
         if (amount < 0) {
-
             dayService.getByUserIDAndDate(date, id).ifPresent(specific -> {
 
                 if (specific.getStripes() > 1) {
@@ -93,7 +92,7 @@ public class DayControllerImpl implements DayController {
                 } else {
                     dayService.delete(specific);
                 }
-                user.setSaldo(user.getSaldo() + (amount * 50));
+                userService.setUserSaldo(user.getSaldo() - (amount * 50), user.getId());
                 stockService.addToStock(amount);
             });
         } else {
@@ -101,10 +100,11 @@ public class DayControllerImpl implements DayController {
                 dayService.save(new Day(user, date, 0));
             }
 
-            user.setSaldo(user.getSaldo() - (amount * 50));
+            userService.setUserSaldo(user.getSaldo() - (amount * 50), user.getId());
             stockService.removeFromStock(amount);
 
             dayService.editStripes(amount, date, id);
         }
+
     }
 }

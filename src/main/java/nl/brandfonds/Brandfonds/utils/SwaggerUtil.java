@@ -10,7 +10,7 @@ import springfox.documentation.service.ApiKey;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class SwaggerUtil {
@@ -23,7 +23,7 @@ public class SwaggerUtil {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())
-                .securitySchemes(Arrays.asList(apiKey()));
+                .securitySchemes(List.of(apiKey()));
     }
 
     private ApiInfo apiInfo() {

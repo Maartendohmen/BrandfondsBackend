@@ -127,7 +127,7 @@ public class DayController {
             dayService.save(new Day(user, date, 0));
         }
 
-        user.setSaldo(user.getSaldo() - (amount * 50));
+        user.setSaldo(user.getSaldo() - (amount * 75L));
         stockService.removeFromStock(amount);
 
         return dayService.addStripes(amount,date, id);
@@ -152,7 +152,7 @@ public class DayController {
             } else {
                 dayService.delete(specific);
             }
-            user.setSaldo(user.getSaldo() + (amount * 50));
+            user.setSaldo(user.getSaldo() + (amount * 75L));
             stockService.addToStock(amount);
         });
     }

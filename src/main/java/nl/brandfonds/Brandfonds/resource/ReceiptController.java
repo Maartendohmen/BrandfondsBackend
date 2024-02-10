@@ -1,9 +1,15 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.Receipt;
@@ -14,33 +20,27 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-@Api(tags = "Receipt", description = "Receipt operations")
+@Tag(name = "Receipt", description = "Receipt operations")
+@SecurityRequirement(name = "Bearer_Authentication")
 public interface ReceiptController {
 
-    @ApiOperation(value = "Upload a receipt file", nickname = "uploadReceiptFile", notes = "Upload a receipt file to save")
+    @Operation(summary = "Upload a receipt file", operationId = "uploadReceiptFile", description = "Upload a receipt file to save")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Receipt file was successfully uploaded", response = ResponseEntity.class),
-            @ApiResponse(code = 409, message = "File already exists on disk", response = ResponseEntity.class),
+            @ApiResponse(responseCode = "200", description = "Receipt file was successfully uploaded"),
+            @ApiResponse(responseCode = "409", description = "File already exists on disk"),
     })
     void uploadReceipt(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException, AlreadyExistException;
 
-    @ApiOperation(value = "Retrieve all receipts", nickname = "retrieveAllReceipts", notes = "Retrieve all receipts info")
+    @Operation(summary = "Retrieve all receipts", operationId = "retrieveAllReceipts", description = "Retrieve all receipts info")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Receipt files were successfully retrieved", response = Receipt.class, responseContainer = "List"),
+            @ApiResponse(responseCode = "200", description = "Receipt files were successfully retrieved", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Receipt.class)))),
     })
     List<Receipt> retrieveAllReceipt();
 
-    @ApiOperation(value = "Retrieve encoded receipt image", nickname = "retrieveEncodedReceiptImage", notes = "Retrieve the encoded receipt image as string", response = String.class)
+    @Operation(summary = "Retrieve raw receipt image", operationId = "retrieveRawReceiptImage", description = "Retrieve the raw receipt image as bytes")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Receipt file was successfully loaded", response = String.class),
-            @ApiResponse(code = 404, message = "Receipt file with filename was not found", response = ResponseEntity.class)
+            @ApiResponse(responseCode = "200", description = "Receipt file was successfully loaded"),
+            @ApiResponse(responseCode = "404", description = "Receipt file with filename was not found")
     })
-    String getEncodedReceiptFileByName(String filename) throws NotFoundException, IOException;
-
-    @ApiOperation(value = "Retrieve raw receipt image", nickname = "retrieveRawReceiptImage", notes = "Retrieve the raw receipt image as bytes", responseContainer = "List")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Receipt file was successfully loaded"),
-            @ApiResponse(code = 404, message = "Receipt file with filename was not found", response = ResponseEntity.class)
-    })
-    ResponseEntity<byte[]> getRawReceiptFileByName(String filename) throws NotFoundException, IOException;
+    byte[] getReceiptFileByName(String filename) throws NotFoundException, IOException;
 }

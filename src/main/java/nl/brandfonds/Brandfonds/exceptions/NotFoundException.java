@@ -15,12 +15,12 @@ public class NotFoundException extends BaseException {
             super("User with id '%s' could not be found", id);
         }
 
-        public UserNotFoundException(String mailadres) {
-            super("User with mailadres '%s' could not be found", mailadres);
+        public UserNotFoundException(String email) {
+            super("User with email '%s' could not be found", email);
         }
 
-        public UserNotFoundException(String mailadres, String password) {
-            super("User with mailadres '%s' and password '%s' could not be found", mailadres, password);
+        public UserNotFoundException(String email, String password) {
+            super("User with email '%s' and password '%s' could not be found", email, password);
         }
     }
 

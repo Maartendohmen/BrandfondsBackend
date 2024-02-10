@@ -1,12 +1,13 @@
 package nl.brandfonds.Brandfonds.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @NoArgsConstructor
@@ -15,9 +16,8 @@ import javax.persistence.Id;
 public class Stock {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     private Integer id;
-
     private Integer currentBottles;
     private Integer returnedBottles;
     private Integer nonStripedBottles;

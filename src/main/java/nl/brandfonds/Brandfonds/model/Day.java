@@ -1,14 +1,17 @@
 package nl.brandfonds.Brandfonds.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import java.time.LocalDate;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @NoArgsConstructor
@@ -17,10 +20,11 @@ import java.time.LocalDate;
 public class Day {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     private Integer id;
     @OneToOne
     private User user;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate date;
     private Integer stripes;
 

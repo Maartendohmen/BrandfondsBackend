@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface RegisterRequestRepository extends JpaRepository<RegisterRequest, Integer> {
 
-    //get registerrequest based on random string
-    @Query("SELECT r FROM RegisterRequest r WHERE randomString = ?1")
+    @Query(value = "SELECT r FROM RegisterRequest r WHERE randomString = ?1")
     Optional<RegisterRequest> getByRandomString(String randomString);
 }

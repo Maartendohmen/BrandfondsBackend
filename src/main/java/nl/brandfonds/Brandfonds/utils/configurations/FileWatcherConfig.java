@@ -1,6 +1,7 @@
 package nl.brandfonds.Brandfonds.utils.configurations;
 
-import nl.brandfonds.Brandfonds.abstraction.IReceiptService;
+import jakarta.annotation.PreDestroy;
+import nl.brandfonds.Brandfonds.services.ReceiptService;
 import nl.brandfonds.Brandfonds.utils.FileWatcherUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,6 @@ import org.springframework.boot.devtools.filewatch.FileSystemWatcher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.time.Duration;
 
@@ -17,9 +17,9 @@ import java.time.Duration;
 public class FileWatcherConfig implements CommandLineRunner {
 
     @Autowired
-    IReceiptService receiptService;
+    ReceiptService receiptService;
 
-    @Value("${file.savelocation}")
+    @Value("${fileSaveLocation}")
     private String fileSaveLocation;
 
     @Bean

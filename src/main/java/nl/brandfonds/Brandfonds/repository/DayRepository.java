@@ -16,24 +16,24 @@ import java.util.Optional;
 public interface DayRepository extends JpaRepository<Day, Integer> {
 
     //Get days based on user ID
-    @Query("SELECT d FROM Day d WHERE user_id = ?1")
+    @Query(value = "SELECT d FROM Day d WHERE d.user.id = ?1")
     List<Day> getByUserID(Integer id);
 
     //Get days based on date
-    @Query("SELECT d FROM Day d WHERE date = ?1")
+    @Query(value = "SELECT d FROM Day d WHERE d.date = ?1")
     List<Day> getByDate(Date date);
 
     //gets day from user by specific day
-    @Query("SELECT d FROM Day d WHERE date = ?1 and user_id = ?2")
+    @Query(value = "SELECT d FROM Day d WHERE d.date = ?1 and d.user.id = ?2")
     Optional<Day> getByUserIDAndDate(LocalDate date, Integer id);
 
     //Add stripe based on user and date
     @Transactional
     @Modifying
-    @Query("UPDATE Day SET stripes = stripes + ?1 WHERE date = ?2 AND user_id = ?3")
+    @Query(value = "UPDATE Day d SET stripes = stripes + ?1 WHERE d.date = ?2 AND d.user.id = ?3")
     void updateStripes(Integer amountOfStripes, LocalDate date, Integer id);
 
-    @Query("SELECT SUM(stripes) FROM Day WHERE user_id = ?1")
+    @Query(value = "SELECT SUM(stripes) FROM Day d WHERE d.user.id = ?1")
     Optional<Integer> getTotalStripesFromUser(Integer id);
 
 }

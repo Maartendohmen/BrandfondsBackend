@@ -1,7 +1,8 @@
 package nl.brandfonds.Brandfonds.utils;
 
-import nl.brandfonds.Brandfonds.abstraction.IReceiptService;
+import lombok.Getter;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
+import nl.brandfonds.Brandfonds.services.ReceiptService;
 import org.springframework.boot.devtools.filewatch.ChangedFile;
 import org.springframework.boot.devtools.filewatch.ChangedFiles;
 import org.springframework.boot.devtools.filewatch.FileChangeListener;
@@ -17,14 +18,10 @@ import java.util.Set;
 @Component
 public class FileWatcherUtil implements FileChangeListener {
 
+    @Getter
+    private static ReceiptService receiptService;
 
-    private static IReceiptService receiptService;
-
-    public static IReceiptService getReceiptService() {
-        return receiptService;
-    }
-
-    public static void setReceiptService(IReceiptService receiptService) {
+    public static void setReceiptService(ReceiptService receiptService) {
         FileWatcherUtil.receiptService = receiptService;
     }
 

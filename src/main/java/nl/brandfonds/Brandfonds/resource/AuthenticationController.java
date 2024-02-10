@@ -1,63 +1,65 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import nl.brandfonds.Brandfonds.model.User;
-import nl.brandfonds.Brandfonds.security.AuthenticationRequest;
-import nl.brandfonds.Brandfonds.security.AuthenticationResponse;
 
-@Api(tags = "Authentication", description = "User authorization operations")
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import nl.brandfonds.Brandfonds.model.security.SignInResponse;
+import nl.brandfonds.Brandfonds.model.security.SignUpRequest;
+
+@Tag(name = "Authentication", description = "Authentication operations")
 public interface AuthenticationController {
 
-    @ApiOperation(value = "Login", nickname = "Login", notes = "Logs in user using forename and password")
+    @Operation(summary = "Login", operationId = "Login", description = "Logs in user using forename and password")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User was successfully logged in", response = AuthenticationResponse.class),
-            @ApiResponse(code = 403, message = "The user is set to inactive"),
-            @ApiResponse(code = 404, message = "The user could not be found with the supplied credentials")
+            @ApiResponse(responseCode = "200", description = "User was successfully logged in", content = {@Content(schema = @Schema(implementation = SignInResponse.class, description = "Jwt token + user details"))}),
+            @ApiResponse(responseCode = "403", description = "The user is set to inactive"),
+            @ApiResponse(responseCode = "404", description = "The user could not be found with the supplied credentials")
     })
-    AuthenticationResponse login(AuthenticationRequest authenticationRequest);
+    SignInResponse login(String email, String password);
 
-    @ApiOperation(value = "Register", nickname = "Register", notes = "Creates a register request for user and sends verification mail")
+    @Operation(summary = "Register", operationId = "Register", description = "Creates a register request for user and sends verification mail")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "The registration request was successfully created"),
-            @ApiResponse(code = 409, message = "There is already a user registered with the same mailadres"),
+            @ApiResponse(responseCode = "200", description = "The registration request was successfully created", content = {@Content(schema = @Schema(implementation = String.class, description = "Jwt token"))}),
+            @ApiResponse(responseCode = "409", description = "There is already a user registered with the same email"),
     })
-    void register(User user);
+    void requestRegistration(SignUpRequest signUpRequest);
 
-    @ApiOperation(value = "Confirm Registration", nickname = "registrationConformation", notes = "Validates registration with generated string and sends activation request to brandmaster")
+    @Operation(summary = "Confirm Registration", operationId = "registrationConformation", description = "Validates registration with generated string and sends activation request to brandmaster")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "The register request was successfully validated"),
-            @ApiResponse(code = 401, message = "The token provided is expired/not found")
+            @ApiResponse(responseCode = "200", description = "The register request was successfully validated"),
+            @ApiResponse(responseCode = "401", description = "The token provided is expired/not found")
     })
-    void checkRegistrationCode(String registrationCode);
+    String confirmRegistration(String registrationCode);
 
-    @ApiOperation(value = "Forgot password", nickname = "forgotPassword", notes = "Checks if user exist and sends password change mail to corresponding mailadres")
+    @Operation(summary = "Forgot password", operationId = "forgotPassword", description = "Checks if user exist and sends password change mail to corresponding email")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Mail was successfully send to corresponding address"),
-            @ApiResponse(code = 404, message = "The provided mailadres is not found")
+            @ApiResponse(responseCode = "200", description = "Mail was successfully send to corresponding address"),
+            @ApiResponse(responseCode = "404", description = "The provided email is not found")
     })
-    void forgotPassword(String mailadres);
+    void forgotPassword(String email);
 
-    @ApiOperation(value = "Forgot password validation", nickname = "forgotPasswordValidation", notes = "Validated if given string is linked to password change request")
+    @Operation(summary = "Forgot password validation", operationId = "forgotPasswordValidation", description = "Validated if given string is linked to password change request")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Change password string is validated"),
-            @ApiResponse(code = 401, message = "The token provided is expired/not found")
+            @ApiResponse(responseCode = "200", description = "Change password string is validated"),
+            @ApiResponse(responseCode = "401", description = "The token provided is expired/not found")
     })
     void checkPasswordResetCode(String passwordResetCode);
 
-    @ApiOperation(value = "Change password", notes = "Changes password to new value", nickname = "changePassword")
+    @Operation(summary = "Change password", operationId = "changePassword", description = "Changes password to new value")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Password was successfully changed"),
-            @ApiResponse(code = 401, message = "The token provided is expired/not found")
+            @ApiResponse(responseCode = "200", description = "Password was successfully changed"),
+            @ApiResponse(responseCode = "401", description = "The token provided is expired/not found")
     })
     void changePassword(String passwordResetCode, String newPassword);
 
-    @ApiOperation(value = "Set user activation", notes = "Set user active/inactive", nickname = "setUserActivation")
+    @Operation(summary = "Set user activation", operationId = "setUserActivation", description = "Set user active/inactive")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User status successfully updated"),
-            @ApiResponse(code = 404, message = "User could not be found")
+            @ApiResponse(responseCode = "200", description = "User status successfully updated"),
+            @ApiResponse(responseCode = "404", description = "User could not be found")
     })
-    void setUserActivation(Integer userId, Boolean isActivated);
+    void setUserActivation(Integer userId);
 }

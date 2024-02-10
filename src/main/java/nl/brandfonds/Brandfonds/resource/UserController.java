@@ -1,74 +1,73 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nl.brandfonds.Brandfonds.model.DepositRequest;
 import nl.brandfonds.Brandfonds.model.User;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
-@Api(tags = "User", description = "User operations")
+@Tag(name = "User", description = "User operations")
+@SecurityRequirement(name = "Bearer_Authentication")
 public interface UserController {
 
-    @ApiOperation(value = "Get users", nickname = "getAllUsers", notes = "Get all registered users", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Get users", operationId = "getAllUsers", description = "Get all registered normal users")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Users successfully retrieved", response = User.class, responseContainer = "List")
+            @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
     })
     List<User> getAll();
 
-    @ApiOperation(value = "Save user", nickname = "saveUser", notes = "Saves a user", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Get saldo user", operationId = "getUserSaldo", description = "Gets the saldo from a user")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User was successfully saved", response = ResponseEntity.class)
-    })
-    void save(User user);
-
-    @ApiOperation(value = "Get saldo user", nickname = "getUserSaldo", notes = "Gets the saldo from a user", authorizations = @Authorization(value = "jwtToken"))
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Saldo was successfully retrieved", response = Long.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class),
+            @ApiResponse(responseCode = "200", description = "Saldo was successfully retrieved"),
+            @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
 
     })
     Long getUserSaldo(Integer id);
 
-    @ApiOperation(value = "Update user saldo", nickname = "updateUserSaldo", notes = "Updates the current saldo of a user", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Update user saldo", operationId = "updateUserSaldo", description = "Updates the current saldo of a user")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Saldo was successfully updated", response = ResponseEntity.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class),
+            @ApiResponse(responseCode = "200", description = "Saldo was successfully updated"),
+            @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
     })
     void setUserSaldo(Integer id, Long amount);
 
-    @ApiOperation(value = "Update user profile picture", nickname = "uploadUserProfilePicture", notes = "Updates the current profile picture of a user", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Update user profile picture", operationId = "uploadUserProfilePicture", description = "Updates the current profile picture of a user")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Profile picture was successfully updated", response = ResponseEntity.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class),
+            @ApiResponse(responseCode = "200", description = "Profile picture was successfully updated"),
+            @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
     })
-    void setUserProfilePicture(Integer id, MultipartFile file) throws IOException;
+    void setUserProfilePicture(Integer id, @RequestParam("image") MultipartFile file) throws IOException;
 
-    @ApiOperation(value = "Get user profile picture", nickname = "getEncodedUserProfilePicture", notes = "Get the current profile picture of a user", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Get user profile picture", operationId = "getProfilePicture", description = "Get the current profile picture of a user")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Profile picture was successfully retrieved", response = String.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class),
+            @ApiResponse(responseCode = "200", description = "Profile picture was successfully retrieved"),
+            @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
     })
-    String getEncodedUserProfilePicture(Integer id) throws IOException;
+    byte[] getUserProfilePicture(Integer id) throws IOException;
 
-    @ApiOperation(value = "Create deposit request", nickname = "createDepositRequest", notes = "Creates a deposit request with given amount", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Create deposit request", operationId = "createDepositRequest", description = "Creates a deposit request with given amount")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Depositrequest was successfully created", response = ResponseEntity.class),
-            @ApiResponse(code = 404, message = "The requested user could not be found", response = ResponseEntity.class)
+            @ApiResponse(responseCode = "200", description = "Depositrequest was successfully created"),
+            @ApiResponse(responseCode = "404", description = "The requested user could not be found")
     })
     void setDepositRequest(Integer id, String amount);
 
-    @ApiOperation(value = "Get deposit requests", nickname = "getDepositRequest", notes = "Gets all deposit requests", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Get deposit requests", operationId = "getDepositRequest", description = "Gets all deposit requests")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "depositrequests were successfully retrieved", response = DepositRequest.class, responseContainer = "List")
+            @ApiResponse(responseCode = "200", description = "depositrequests were successfully retrieved")
     })
     List<DepositRequest> getDepositRequests();
 
-    @ApiOperation(value = "Set deposit status", nickname = "setDepositRequest", notes = "Sets the status of the deposit to approved/unapproved", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Set deposit status", operationId = "setDepositRequest", description = "Sets the status of the deposit to approved/unapproved")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "depositrequests was successfully edited")
+            @ApiResponse(responseCode = "200", description = "depositrequests was successfully edited")
     })
     void handleDepositRequest(Integer id, Boolean approve);
 }

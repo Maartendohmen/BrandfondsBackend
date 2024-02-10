@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface PasswordChangeRequestRepository extends JpaRepository<PasswordChangeRequest, Integer> {
 
-    //get passwordrequest based on random string
-    @Query("SELECT r FROM PasswordChangeRequest r WHERE randomString = ?1")
+    @Query(value = "SELECT r FROM PasswordChangeRequest r WHERE randomString = ?1")
     Optional<PasswordChangeRequest> getByRandomString(String randomString);
 }

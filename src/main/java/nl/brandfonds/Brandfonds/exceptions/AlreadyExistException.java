@@ -17,8 +17,8 @@ public class AlreadyExistException extends BaseException {
     }
 
     public static class UserAlreadyExistException extends AlreadyExistException {
-        public UserAlreadyExistException(String mailAdres) {
-            super("User with mailadres '%s' already exists", mailAdres);
+        public UserAlreadyExistException(String email) {
+            super("User with email '%s' already exists", email);
         }
     }
 }

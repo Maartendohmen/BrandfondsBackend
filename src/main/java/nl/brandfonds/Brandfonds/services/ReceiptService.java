@@ -1,8 +1,7 @@
-package nl.brandfonds.Brandfonds.implementation.database;
+package nl.brandfonds.Brandfonds.services;
 
-import nl.brandfonds.Brandfonds.abstraction.IReceiptService;
-import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException.FileAlreadyExistException;
-import nl.brandfonds.Brandfonds.exceptions.NotFoundException.FileNotFoundException;
+import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
+import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.Receipt;
 import nl.brandfonds.Brandfonds.repository.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +16,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static nl.brandfonds.Brandfonds.utils.ImageManipulation.resizeAndCompressImage;
 
 @Service
-public class ReceiptDBImpl implements IReceiptService {
+public class ReceiptService {
 
     @Autowired
-    ReceiptRepository receiptRepository;
-    @Value("${file.savelocation}")
+    private ReceiptRepository receiptRepository;
+
+    @Value("${fileSaveLocation}")
     private String fileSaveLocation;
 
-    @Override
     public void saveReceiptFile(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException {
 
         String filename = file.getOriginalFilename();
@@ -42,7 +39,7 @@ public class ReceiptDBImpl implements IReceiptService {
         String filePath = getReceiptFilePath(filename);
 
         receiptRepository.getByName(filename).ifPresent((foundName) -> {
-            throw new FileAlreadyExistException(foundName.getFileName());
+            throw new AlreadyExistException.FileAlreadyExistException(foundName.getFileName());
         });
 
         BufferedImage bufferedImageResource = resizeAndCompressImage(file);
@@ -57,30 +54,27 @@ public class ReceiptDBImpl implements IReceiptService {
         receiptRepository.save(dbFile);
     }
 
-    @Override
+
     public void delete(Receipt receipt) {
         receiptRepository.delete(receipt);
     }
 
-    @Override
     public List<Receipt> getAll() {
         return receiptRepository.findAll();
     }
 
-    @Override
     public Receipt getReceiptByName(String name) {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
+        dbReceipt.orElseThrow(() -> new NotFoundException.FileNotFoundException(fileSaveLocation, name));
 
         return dbReceipt.get();
     }
 
-    @Override
     public String getEncodedReceiptFileByName(String name) throws IOException {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
+        dbReceipt.orElseThrow(() -> new NotFoundException.FileNotFoundException(fileSaveLocation, name));
         String filePath = getReceiptFilePath(dbReceipt.get().getFileName());
 
         Path path = Paths.get(filePath);
@@ -89,11 +83,10 @@ public class ReceiptDBImpl implements IReceiptService {
         return Base64.getEncoder().encodeToString(data);
     }
 
-    @Override
     public byte[] getRawReceiptFileByName(String name) throws IOException {
         Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
 
-        dbReceipt.orElseThrow(() -> new FileNotFoundException(fileSaveLocation, name));
+        dbReceipt.orElseThrow(() -> new NotFoundException.FileNotFoundException(fileSaveLocation, name));
         String filePath = getReceiptFilePath(dbReceipt.get().getFileName());
 
         Path path = Paths.get(filePath);
@@ -107,5 +100,4 @@ public class ReceiptDBImpl implements IReceiptService {
 
         return String.format("%s%s%s%s", fileSaveLocation, folderName, fileSeparator, fileName);
     }
-
 }

@@ -1,13 +1,15 @@
 package nl.brandfonds.Brandfonds.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @NoArgsConstructor
@@ -15,14 +17,14 @@ import java.time.LocalDateTime;
 public class PasswordChangeRequest {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     private Integer id;
-    private String mailadres;
+    private String email;
     private String randomString;
     private LocalDateTime initialDate;
 
-    public PasswordChangeRequest(String mailadres) {
-        this.mailadres = mailadres;
+    public PasswordChangeRequest(String email) {
+        this.email = email;
         this.randomString = RandomStringUtils.randomAlphanumeric(10);
         this.initialDate = LocalDateTime.now();
     }

@@ -1,38 +1,30 @@
 package nl.brandfonds.Brandfonds.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.commons.lang3.RandomStringUtils;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
-@NoArgsConstructor
+@Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterRequest {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     private Integer id;
     private String randomString;
     private LocalDateTime initialDate;
-
-    private String mailadres;
-    private String forename;
-    private String surname;
+    private String email;
+    private String firstName;
+    private String lastName;
     private String password;
 
-    public RegisterRequest(String mailadres, String forename, String surname, String password) {
-        this.randomString = RandomStringUtils.randomAlphanumeric(15);
-        this.initialDate = LocalDateTime.now();
-        this.mailadres = mailadres;
-        this.forename = forename;
-        this.surname = surname;
-        this.password = password;
-    }
 }

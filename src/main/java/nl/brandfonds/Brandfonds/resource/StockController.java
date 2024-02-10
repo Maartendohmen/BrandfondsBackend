@@ -1,34 +1,40 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nl.brandfonds.Brandfonds.model.Stock;
-import org.springframework.http.ResponseEntity;
 
-@Api(tags = "Stock", description = "Stock operations")
+@Tag(name = "Stock", description = "Stock operations")
+@SecurityRequirement(name = "Bearer_Authentication")
 public interface StockController {
 
-    @ApiOperation(value = "Get current stock", nickname = "getCurrentStock", notes = "Gets the current stock", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Get current stock", operationId = "getCurrentStock", description = "Gets the current stock")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Stock was successfully retrieved", response = Stock.class),
-            @ApiResponse(code = 404, message = "The stock values weren't found", response = ResponseEntity.class)
+            @ApiResponse(responseCode = "200", description = "Stock was successfully retrieved"),
+            @ApiResponse(responseCode = "404", description = "The stock values weren't found")
     })
     Stock getStock();
 
-    @ApiOperation(value = "Update current bottles", nickname = "updateCurrentBottles", notes = "Updates the amount of bottles currently in stock", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Update current bottles", operationId = "updateCurrentBottles", description = "Updates the amount of bottles currently in stock")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Stock was successfully updated", response = Integer.class)
+            @ApiResponse(responseCode = "200", description = "Stock was successfully updated")
     })
     void updateCurrentBottles(Integer Amount);
 
-    @ApiOperation(value = "Update returned bottles", nickname = "updateReturnedBottles", notes = "Updates the amount of bottles returned to the store", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Update returned bottles", operationId = "updateReturnedBottles", description = "Updates the amount of bottles returned to the store")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "returned bottles was successfully updated", response = Integer.class)
+            @ApiResponse(responseCode = "200", description = "returned bottles was successfully updated")
     })
     void updateReturnedBottles(Integer amount);
 
-    @ApiOperation(value = "Update non striped bottles", nickname = "updateNonStripedBottles", notes = "Updates the amount of bottles that are not striped", authorizations = @Authorization(value = "jwtToken"))
+    @Operation(summary = "Update non striped bottles", operationId = "updateNonStripedBottles", description = "Updates the amount of bottles that are not striped")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "non striped bottles was successfully updated", response = Integer.class)
+            @ApiResponse(responseCode = "200", description = "non striped bottles was successfully updated")
     })
     void updateNotStripedBottles(Integer amount);
 }

@@ -24,7 +24,7 @@ public class ReceiptControllerImpl implements ReceiptController {
     public void uploadReceipt(@RequestParam("file") MultipartFile file,
                               @RequestParam("description") String description,
                               @RequestParam(value = "date", required = false) LocalDate paidDate,
-                              @RequestParam(name = "paidAmount", required = false) Long paidAmount) throws IOException, AlreadyExistException {
+                              @RequestParam(name = "paidAmount", required = false) Float paidAmount) throws IOException, AlreadyExistException {
 
         if (paidDate == null) {
             paidDate = LocalDate.now();

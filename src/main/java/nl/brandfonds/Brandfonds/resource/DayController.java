@@ -9,10 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import nl.brandfonds.Brandfonds.model.Day;
+import nl.brandfonds.Brandfonds.model.responses.StripesPerMonth;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "Stripes", description = "Stripes operations")
 @SecurityRequirement(name = "Bearer_Authentication")
@@ -40,7 +39,7 @@ public interface DayController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Total stripes/months successfully retrieved")
     })
-    Map<LocalDate, Integer> getTotalStripesPerMonth(Integer id);
+    List<StripesPerMonth> getTotalStripesPerMonth(Integer id);
 
     @Operation(summary = "Edit stripe(s) user", operationId = "editStripesForUser", description = "Edit stripe(s) for a specific user")
     @ApiResponses({

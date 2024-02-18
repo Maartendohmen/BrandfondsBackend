@@ -32,7 +32,7 @@ public class ReceiptService {
     @Value("${fileSaveLocation}")
     private String fileSaveLocation;
 
-    public void saveReceiptFile(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException {
+    public void saveReceiptFile(MultipartFile file, String description, LocalDate paidDate, Float paidAmount) throws IOException {
 
         String filename = file.getOriginalFilename();
         String fileType = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);

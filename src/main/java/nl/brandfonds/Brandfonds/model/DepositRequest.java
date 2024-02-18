@@ -23,12 +23,12 @@ public class DepositRequest {
     private Integer id;
     @OneToOne
     private User user;
-    private long amount; //in cents;
+    private Float amount;
     private LocalDateTime requestDate;
     private LocalDateTime handledDate;
     private boolean accepted;
 
-    public DepositRequest(User user, long amount) {
+    public DepositRequest(User user, Float amount) {
         this.user = user;
         this.amount = amount;
         this.requestDate = LocalDateTime.now();

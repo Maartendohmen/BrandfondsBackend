@@ -23,9 +23,9 @@ public class Receipt {
     private String fileName;
     private String description;
     private LocalDate paidDate;
-    private long paidAmount;
+    private Float paidAmount;
 
-    public Receipt(String filename, String description, LocalDate paidDate, long paidAmount) {
+    public Receipt(String filename, String description, LocalDate paidDate, Float paidAmount) {
         this.fileName = filename;
         this.description = description;
         this.paidDate = paidDate;

@@ -27,7 +27,7 @@ public class StockControllerImpl implements StockController {
         stockService.updateReturnedBottles(amount);
     }
 
-    @PutMapping(path = "/editnonstripedbottles/{amount}")
+    @PutMapping(path = "/editNonStripedBottles/{amount}")
     public void updateNotStripedBottles(@PathVariable("amount") Integer amount) {
         stockService.updateNonStripedBottles(amount);
     }

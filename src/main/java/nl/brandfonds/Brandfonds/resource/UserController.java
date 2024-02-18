@@ -29,14 +29,14 @@ public interface UserController {
             @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
 
     })
-    Long getUserSaldo(Integer id);
+    Float getUserSaldo(Integer id);
 
     @Operation(summary = "Update user saldo", operationId = "updateUserSaldo", description = "Updates the current saldo of a user")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Saldo was successfully updated"),
             @ApiResponse(responseCode = "404", description = "The requested user could not be found"),
     })
-    void setUserSaldo(Integer id, Long amount);
+    void setUserSaldo(Integer id, Float amount);
 
     @Operation(summary = "Update user profile picture", operationId = "uploadUserProfilePicture", description = "Updates the current profile picture of a user")
     @ApiResponses({
@@ -57,7 +57,7 @@ public interface UserController {
             @ApiResponse(responseCode = "200", description = "Depositrequest was successfully created"),
             @ApiResponse(responseCode = "404", description = "The requested user could not be found")
     })
-    void setDepositRequest(Integer id, String amount);
+    void setDepositRequest(Integer id, Float amount);
 
     @Operation(summary = "Get deposit requests", operationId = "getDepositRequest", description = "Gets all deposit requests")
     @ApiResponses({

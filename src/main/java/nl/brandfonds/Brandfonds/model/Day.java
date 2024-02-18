@@ -27,10 +27,12 @@ public class Day {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate date;
     private Integer stripes;
+    private Float stripeCost;
 
-    public Day(User user, LocalDate date, Integer stripes) {
+    public Day(User user, LocalDate date, Integer stripes, Float stripCost) {
         this.user = user;
         this.date = date;
         this.stripes = stripes;
+        this.stripeCost = stripCost;
     }
 }

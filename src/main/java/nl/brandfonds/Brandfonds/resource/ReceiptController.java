@@ -1,8 +1,6 @@
 package nl.brandfonds.Brandfonds.resource;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import nl.brandfonds.Brandfonds.exceptions.AlreadyExistException;
 import nl.brandfonds.Brandfonds.exceptions.NotFoundException;
 import nl.brandfonds.Brandfonds.model.Receipt;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,7 +26,7 @@ public interface ReceiptController {
             @ApiResponse(responseCode = "200", description = "Receipt file was successfully uploaded"),
             @ApiResponse(responseCode = "409", description = "File already exists on disk"),
     })
-    void uploadReceipt(MultipartFile file, String description, LocalDate paidDate, Long paidAmount) throws IOException, AlreadyExistException;
+    void uploadReceipt(MultipartFile file, String description, LocalDate paidDate, Float paidAmount) throws IOException, AlreadyExistException;
 
     @Operation(summary = "Retrieve all receipts", operationId = "retrieveAllReceipts", description = "Retrieve all receipts info")
     @ApiResponses({

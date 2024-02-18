@@ -33,8 +33,8 @@ public class User implements UserDetails, Comparable<User> {
     private String lastname;
     private String profilePictureFileName;
     private String password;
-    @Column(columnDefinition = "double")
-    private long saldo; //in cents
+    @Column(precision = 2)
+    private Float saldo;
     private boolean activated;
 
     @Override

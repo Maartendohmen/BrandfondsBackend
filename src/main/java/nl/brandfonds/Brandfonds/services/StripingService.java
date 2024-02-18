@@ -6,6 +6,7 @@ import nl.brandfonds.Brandfonds.model.User;
 import nl.brandfonds.Brandfonds.repository.DayRepository;
 import nl.brandfonds.Brandfonds.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +15,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class StripingService {
+
+    @Value("${striping-cost}")
+    private Float stripingCost;
 
     @Autowired
     private DayRepository dayRepository;
@@ -53,7 +57,7 @@ public class StripingService {
         stock.setCurrentBottles(stock.getCurrentBottles() + amount);
         stockRepository.save(stock);
 
-        user.setSaldo(user.getSaldo() + (amount * 75L * -1));
+        user.setSaldo(user.getSaldo() + (amount * stripingCost * -1));
         userService.save(user);
     }
 
@@ -68,7 +72,7 @@ public class StripingService {
 
     private void addStripeOnDay(User user, LocalDate date, Integer amount, Day selectedDay) {
         if (selectedDay == null) {
-            dayRepository.save(new Day(user, date, amount));
+            dayRepository.save(new Day(user, date, amount, stripingCost));
         } else {
             selectedDay.setStripes(selectedDay.getStripes() + amount);
             dayRepository.save(selectedDay);

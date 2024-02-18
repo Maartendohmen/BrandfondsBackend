@@ -30,24 +30,24 @@ public class UserControllerImpl implements UserController {
     }
 
     @GetMapping(path = "/saldo/{userId}")
-    public Long getUserSaldo(@PathVariable(value = "userId") Integer userId) {
+    public Float getUserSaldo(@PathVariable(value = "userId") Integer userId) {
         return userService.getById(userId).getSaldo();
     }
 
     @PutMapping(path = "/saldo/{userId}")
     public void setUserSaldo(@PathVariable("userId") Integer userId,
-                             @RequestBody Long amount) {
+                             @RequestBody Float amount) {
         var changingUser = userService.getById(userId);
         changingUser.setSaldo(amount);
         userService.save(changingUser);
     }
 
-    @PostMapping(path = "/profile_picture/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(path = "/profilePicture/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void setUserProfilePicture(@PathVariable("userId") Integer userId, @RequestParam("image") MultipartFile file) throws IOException {
         userService.saveProfilePicture(userId, file);
     }
 
-    @GetMapping(path = "/profile_picture/{userId}", produces = {
+    @GetMapping(path = "/profilePicture/{userId}", produces = {
             MediaType.IMAGE_JPEG_VALUE
     })
     public byte[] getUserProfilePicture(@PathVariable("userId") Integer userId) throws IOException {
@@ -55,8 +55,8 @@ public class UserControllerImpl implements UserController {
     }
 
     @PostMapping(path = "/deposit/{userId}")
-    public void setDepositRequest(@PathVariable("userId") Integer userId, @RequestBody String amount) {
-        depositRequestService.save(new DepositRequest(userService.getById(userId), Long.parseLong(amount)));
+    public void setDepositRequest(@PathVariable("userId") Integer userId, @RequestBody Float amount) {
+        depositRequestService.save(new DepositRequest(userService.getById(userId), amount));
     }
 
     //todo maybe add method for getting deposit requests for single user

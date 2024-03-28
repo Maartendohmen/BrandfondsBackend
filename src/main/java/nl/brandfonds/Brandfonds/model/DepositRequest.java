@@ -1,5 +1,6 @@
 package nl.brandfonds.Brandfonds.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -24,7 +25,9 @@ public class DepositRequest {
     @OneToOne
     private User user;
     private Float amount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime requestDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime handledDate;
     private boolean accepted;
 

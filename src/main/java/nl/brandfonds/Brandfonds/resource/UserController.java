@@ -21,7 +21,7 @@ public interface UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
     })
-    List<User> getAll();
+    List<User> getAll(Boolean excludeDeactivated);
 
     @Operation(summary = "Get saldo user", operationId = "getUserSaldo", description = "Gets the saldo from a user")
     @ApiResponses({
@@ -63,7 +63,7 @@ public interface UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "depositrequests were successfully retrieved")
     })
-    List<DepositRequest> getDepositRequests();
+    List<DepositRequest> getDepositRequests(Boolean excludeHandledRequests);
 
     @Operation(summary = "Set deposit status", operationId = "setDepositRequest", description = "Sets the status of the deposit to approved/unapproved")
     @ApiResponses({

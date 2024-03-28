@@ -29,8 +29,8 @@ public class User implements UserDetails, Comparable<User> {
     private UserRole role;
     @Column(unique = true)
     private String email;
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
     private String profilePictureFileName;
     private String password;
     @Column(precision = 2)
@@ -74,6 +74,6 @@ public class User implements UserDetails, Comparable<User> {
 
     @Override
     public int compareTo(User user) {
-        return this.getFirstname().compareTo(user.getFirstname());
+        return this.getFirstName().compareTo(user.getFirstName());
     }
 }

@@ -25,8 +25,13 @@ public class UserControllerImpl implements UserController {
     DepositRequestService depositRequestService;
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll().stream().filter(user -> user.getRole() == UserRole.NORMAL).sorted(User::compareTo).toList();
+    public List<User> getAll(@RequestParam(defaultValue = "true") Boolean excludeDeactivated) {
+        var users = userService.getAll().stream().filter(user -> user.getRole() == UserRole.NORMAL).sorted(User::compareTo);
+
+        if (excludeDeactivated) {
+            users = users.filter(User::isActivated);
+        }
+        return users.toList();
     }
 
     @GetMapping(path = "/saldo/{userId}")
@@ -62,12 +67,13 @@ public class UserControllerImpl implements UserController {
     //todo maybe add method for getting deposit requests for single user
 
     @GetMapping(path = "/deposit")
-    public List<DepositRequest> getDepositRequests() {
-        return depositRequestService.getAll();
+    public List<DepositRequest> getDepositRequests(@RequestParam(defaultValue = "false") Boolean excludeHandledRequests) {
+        var allDepositRequests = depositRequestService.getAll();
+        return excludeHandledRequests ? allDepositRequests.stream().filter(depositRequest -> depositRequest.getHandledDate() == null).toList() : allDepositRequests;
     }
 
-    @RequestMapping(path = "/depositHandling/{id}/{approve}", method = RequestMethod.GET)
-    public void handleDepositRequest(@PathVariable("id") Integer id, @PathVariable("approve") Boolean approve) {
+    @RequestMapping(path = "/depositHandling/{id}", method = RequestMethod.GET)
+    public void handleDepositRequest(@PathVariable("id") Integer id, @RequestParam(defaultValue = "false") Boolean approve) {
 
         var depositRequest = depositRequestService.getById(id);
 

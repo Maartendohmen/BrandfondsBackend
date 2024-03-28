@@ -71,17 +71,18 @@ public class AuthenticationService {
 
         var user = User.builder()
                 .email(retrievedRegisterRequest.getEmail())
-                .firstname(retrievedRegisterRequest.getFirstName())
-                .lastname(retrievedRegisterRequest.getLastName())
+                .firstName(retrievedRegisterRequest.getFirstName())
+                .lastName(retrievedRegisterRequest.getLastName())
                 .password(retrievedRegisterRequest.getPassword())
+                .saldo(0f)
                 .role(UserRole.NORMAL)
                 .build();
 
         var savedUser = userService.save(user);
         var jwt = jwtService.generateToken(user);
         mailService.sendUserActivationMail("brandmeester@brandfonds.nl",
-                savedUser.getEmail(), savedUser.getFirstname() + " "
-                        + savedUser.getLastname(), savedUser.getId());
+                savedUser.getEmail(), savedUser.getFirstName() + " "
+                        + savedUser.getLastName(), savedUser.getId());
 
         return jwt;
     }
@@ -110,7 +111,7 @@ public class AuthenticationService {
         var userToUpdate = userService.getById(id);
         userToUpdate.setActivated(true);
         userService.save(userToUpdate);
-        mailService.sendUserActivatedMail(userToUpdate.getEmail(), userToUpdate.getEmail(), userToUpdate.getFirstname());
+        mailService.sendUserActivatedMail(userToUpdate.getEmail(), userToUpdate.getEmail(), userToUpdate.getFirstName());
     }
 
     public SignInResponse login(String email, String password) {

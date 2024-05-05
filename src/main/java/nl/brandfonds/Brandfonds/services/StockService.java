@@ -17,23 +17,7 @@ public class StockService {
         return stockRepository.findAll().stream().findFirst().orElseThrow(NotFoundException.StockNotFoundException::new);
     }
 
-    public void updateCurrentBottles(Integer amount) {
-        var stock = getStock();
-        stock.setCurrentBottles(stock.getCurrentBottles() + amount);
-        stockRepository.save(stock);
+    public void updateStock(Stock newStock) {
+        stockRepository.save(newStock);
     }
-
-    public void updateReturnedBottles(Integer amount) {
-        var stock = getStock();
-        stock.setReturnedBottles(stock.getCurrentBottles() + amount);
-        stockRepository.save(stock);
-    }
-
-    public void updateNonStripedBottles(Integer amount) {
-        var stock = getStock();
-        stock.setNonStripedBottles(stock.getNonStripedBottles() + amount);
-        stockRepository.save(stock);
-    }
-
-
 }

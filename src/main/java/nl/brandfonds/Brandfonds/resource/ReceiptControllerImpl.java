@@ -38,9 +38,9 @@ public class ReceiptControllerImpl implements ReceiptController {
         return receiptService.getAll();
     }
 
-    @GetMapping(path = "/file/raw/{filename}", produces = "image/jpeg")
-    public byte[] getReceiptFileByName(@PathVariable("filename") String filename) throws NotFoundException, IOException {
-        return receiptService.getRawReceiptFileByName(filename);
+    @GetMapping(path = "/image/{receiptId}", produces = "image/jpeg")
+    public byte[] getReceiptFileByName(@PathVariable("receiptId") Integer receiptId) throws NotFoundException, IOException {
+        return receiptService.getRawReceiptFileByName(receiptId);
     }
 }
 

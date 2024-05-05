@@ -83,10 +83,10 @@ public class ReceiptService {
         return Base64.getEncoder().encodeToString(data);
     }
 
-    public byte[] getRawReceiptFileByName(String name) throws IOException {
-        Optional<Receipt> dbReceipt = receiptRepository.getByName(name);
+    public byte[] getRawReceiptFileByName(Integer id) throws IOException {
+        Optional<Receipt> dbReceipt = receiptRepository.findById(id);
 
-        dbReceipt.orElseThrow(() -> new NotFoundException.FileNotFoundException(fileSaveLocation, name));
+        dbReceipt.orElseThrow(() -> new NotFoundException.FileNotFoundException(id, fileSaveLocation));
         String filePath = getReceiptFilePath(dbReceipt.get().getFileName());
 
         Path path = Paths.get(filePath);

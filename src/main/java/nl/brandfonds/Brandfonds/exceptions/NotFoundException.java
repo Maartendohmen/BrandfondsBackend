@@ -28,6 +28,10 @@ public class NotFoundException extends BaseException {
         public FileNotFoundException(String fileName, String filePath) {
             super("File with name '%s' could not be found on path '%s'", fileName, filePath);
         }
+
+        public FileNotFoundException(Integer id, String filePath) {
+            super("File with id '%s' could not be found on path '%s'", id, filePath);
+        }
     }
 
     public static class DepositRequestNotFoundException extends NotFoundException {

@@ -39,5 +39,5 @@ public interface ReceiptController {
             @ApiResponse(responseCode = "200", description = "Receipt file was successfully loaded"),
             @ApiResponse(responseCode = "404", description = "Receipt file with filename was not found")
     })
-    byte[] getReceiptFileByName(String filename) throws NotFoundException, IOException;
+    byte[] getReceiptFileByName(Integer receiptId) throws NotFoundException, IOException;
 }

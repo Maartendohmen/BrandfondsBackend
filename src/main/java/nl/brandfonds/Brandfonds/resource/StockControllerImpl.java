@@ -17,18 +17,8 @@ public class StockControllerImpl implements StockController {
         return stockService.getStock();
     }
 
-    @PutMapping(path = "/editCurrentBottles/{amount}")
-    public void updateCurrentBottles(@PathVariable("amount") Integer amount) {
-        stockService.updateCurrentBottles(amount);
-    }
-
-    @PutMapping(path = "/editReturnedBottles/{amount}")
-    public void updateReturnedBottles(@PathVariable("amount") Integer amount) {
-        stockService.updateReturnedBottles(amount);
-    }
-
-    @PutMapping(path = "/editNonStripedBottles/{amount}")
-    public void updateNotStripedBottles(@PathVariable("amount") Integer amount) {
-        stockService.updateNonStripedBottles(amount);
+    @PutMapping
+    public void updateStock(@RequestBody Stock updatedStock) {
+        stockService.updateStock(updatedStock);
     }
 }

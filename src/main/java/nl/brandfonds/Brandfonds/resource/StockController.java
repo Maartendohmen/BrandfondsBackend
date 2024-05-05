@@ -20,21 +20,10 @@ public interface StockController {
     })
     Stock getStock();
 
-    @Operation(summary = "Update current bottles", operationId = "updateCurrentBottles", description = "Updates the amount of bottles currently in stock")
+    @Operation(summary = "Update stock", operationId = "updateStock", description = "Updates the stock")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Stock was successfully updated")
     })
-    void updateCurrentBottles(Integer Amount);
+    void updateStock(Stock updatedStock);
 
-    @Operation(summary = "Update returned bottles", operationId = "updateReturnedBottles", description = "Updates the amount of bottles returned to the store")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "returned bottles was successfully updated")
-    })
-    void updateReturnedBottles(Integer amount);
-
-    @Operation(summary = "Update non striped bottles", operationId = "updateNonStripedBottles", description = "Updates the amount of bottles that are not striped")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "non striped bottles was successfully updated")
-    })
-    void updateNotStripedBottles(Integer amount);
 }

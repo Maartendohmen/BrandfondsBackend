@@ -1,5 +1,6 @@
 package nl.brandfonds.Brandfonds.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -22,6 +23,7 @@ public class Receipt {
     private Integer id;
     private String fileName;
     private String description;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate paidDate;
     private Float paidAmount;
 
